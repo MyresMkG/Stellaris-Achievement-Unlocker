@@ -113,10 +113,4 @@ achievement_unlocker_src/
 └── tools/
     ├── scan_test.cpp      离线验证工具（映射 exe 后跑真实代码）
     └── build_test.bat
-
-achievement_unlocker_dll/
-├── achievement_unlocker.dll
-├── achievement_unlocker.dll.bak_before_hardening   加固前的最后一个版本（回退用）
-├── 使用说明.md
-└── 验证记录_离线扫描.txt
 ```
