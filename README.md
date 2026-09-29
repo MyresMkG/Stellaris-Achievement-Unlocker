@@ -55,8 +55,6 @@ cd achievement_unlocker_src
 build.bat            :: 需要 MinGW-w64 的 g++；不在 PATH 时先 set MINGW_BIN=...
 ```
 
-产物在 `build\achievement_unlocker.dll`，发布用的副本放在 `..\achievement_unlocker_dll\`。
-
 ## 离线验证（不需要启动游戏）
 
 ```
