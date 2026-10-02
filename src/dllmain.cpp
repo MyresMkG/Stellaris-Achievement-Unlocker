@@ -17,7 +17,7 @@ HMODULE g_self = nullptr;
 
 // Identifies the build in the first log line, so a log file can be traced
 // back to the DLL that produced it.
-constexpr char kBuild[] = "r2 2026-09-29";
+constexpr char kBuild[] = "r3 2026-10-02";
 
 // When a file with this name sits next to the DLL, the unlocker only resolves
 // and reports; it writes nothing and does not touch the flags.

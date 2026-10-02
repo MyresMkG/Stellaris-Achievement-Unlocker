@@ -1,17 +1,54 @@
-# achievement_unlocker —— 运行时成就解锁 DLL
+# achievement_unlocker —— 运行时成就解锁 + 铁人控制台解锁 DLL
 
 配合 `stellaris_mod_injector` 使用：把编译好的 `achievement_unlocker.dll` 放进游戏根目录的
 `injected_mods\`，注入器会自动把它注入 `stellaris.exe`。**不修改任何游戏文件**，所有改动
 只在进程内存里，重启游戏即消失。
 
-它解决四件事（对应反编译 `stellaris_4.5_source.cpp` 里成就判定的四个字节：
+它解决六件事：前四件对应反编译 `stellaris_4.5_source.cpp` 里成就判定的四个字节，
+后两件解除铁人模式下的控制台封锁：
 
-| # | 补丁 | 运行期签名（在 4.5.0 / 4.5.1 上唯一） | 改动 | 作用 |
+| # | 补丁 | 运行期签名（名字 = 日志里的名字） | 改动 | 作用 |
 |---|------|--------------------------------------|------|------|
-| 1 | mods / 文件校验和 | `8B F0 85 C0 41 0F 94 C6` | `85 C0` → `31 C0` | 游戏文件校验和不符时也不禁用成就 |
+| 1 | mods / 文件校验和 (`mods / file checksum`) | `8B F0 85 C0 41 0F 94 C6` | `85 C0` → `31 C0` | 游戏文件校验和不符时也不禁用成就 |
 | 2 | 控制台 → 存档标记 | `C6 80 FC 00 00 00 01 E8` | `01` → `00` | 执行过控制台命令不再写"作弊"到当前存档 |
 | 3 | 控制台 → 管理器标记 | `C6 80 83 00 00 00 01` | `01` → `00` | 同上（成就管理器的 0x83） |
 | 4 | 读档 → 管理器标记 | `0F B6 8E FC 00 00 00 88 88 83 00 00 00` | 6 字节 → `90`×6 | 加载旧"作弊"存档不再同步禁用标志 |
+| 5 | 铁人控制台 (`ironman console (idle)`) | 见下 | `01` → `00` | 铁人模式下也能打开控制台并执行命令 |
+| 6 | 铁人控制台 (`ironman console (restore)`) | 见下 | `01` → `00` | 同上（第二处，`CGameIdler::RestoreDeviceObjects`） |
+
+补丁 5 的签名：
+
+```
+45 38 BE 80 01 00 00 75 ?? 48 8B 05 ?? ?? ?? ?? 48 8B 88 B0 09 00 00
+44 38 B9 1E 01 00 00 75 ?? 40 32 FF EB ?? 40 B7 01
+```
+
+补丁 6 的签名：
+
+```
+80 BE 80 01 00 00 00 75 ?? 48 8B 05 ?? ?? ?? ?? 48 8B 88 B0 09 00 00
+80 B9 1E 01 00 00 00 75 ?? 32 DB EB ?? B3 01
+```
+
+（注：使用deepseek-v4.1-flash编写，harness为Kimi Code）
+
+### 铁人控制台补丁（5/6）的原理
+
+游戏每帧从铁人标志 `[[CGameState]+0x9B0]+0x11E` 推出一个"控制台禁用位"（`联机 || 铁人`），
+然后做两件事：写进 `CConsoleCmdManager+0xA9`（`CConsoleCmdManager::Execute` 会据此拒绝
+**所有**控制台命令），以及置位 `CConsole` 的 stay-hidden 闩锁（`CConsole::Show()` 见它直接
+返回，所以连窗口都打不开）。这就是 `~` 在铁人档里毫无反应的原因。
+
+补丁 5/6 只改这两处派生的**立即数**（`mov dil,1` / `mov bl,1` → `mov reg,0`，各 1 字节），
+于是禁用位恒为 0：控制台能开、命令能执行。选择改这里而不是 `Execute` 里的判断，是因为
+`Execute` 只管"执行"，界面还有一道 stay-hidden 闸；改派生值一次解决两道闸。
+
+**`is_ironman` 触发器不做任何修改**：脚本里 `is_ironman = yes/no` 仍返回真实值，
+存档、成就相关判定也不受影响。
+
+副作用：禁用位与"联机禁用"共用，所以联机时的全局控制台封锁同样被解除；但联机侧并未完全
+放开——一部分命令自己还会单独检查联机标志（反编译 3814468 / 3815026 / 3815792），
+联机下还有 `CInGameIdler::ForceHideConsole`（707200）会再次隐藏控制台。
 
 另外，DLL 会解析 `CAchievementsManager::AccessInstance()`：先取 1 号补丁点后面的 `call`，
 失败再取 3 号补丁前的 `call`；同时用通配签名独立定位一次静态槽。**只有两条派生结果一致时才
@@ -24,8 +61,6 @@
 - 注入时机晚于初始化（例如附加到已运行的游戏）时，标志已经变成"禁用"，靠它扳回来；
 - 某个版本改了代码形状、签名找不到时，剩下的补丁点仍生效，日志会逐条说明；
 - 槽位解析不出来、或解出来的对象不像管理器时，只打印日志，一个字节都不写。
-
-（注：使用deepseek-v4.1-flash编写，harness为Kimi Code）
 
 ## 判定链背景（简版）
 
@@ -55,6 +90,8 @@ cd achievement_unlocker_src
 build.bat            :: 需要 MinGW-w64 的 g++；不在 PATH 时先 set MINGW_BIN=...
 ```
 
+产物在 `build\achievement_unlocker.dll`，发布用的副本放在 `..\achievement_unlocker_dll\`。
+
 ## 离线验证（不需要启动游戏）
 
 ```
@@ -68,8 +105,31 @@ dry-run → 写补丁 → 再扫描（幂等检查）。报告里除了补丁 RV
 （`call site + signature agree` 等），一眼就能看出新增的交叉校验是否生效。两个真实构建
 （4.5.0 / 4.5.1）的输出与预期值（补丁字节 RVA 依次为
 `0x1B94A0 / 0x9225ED(5.1: 0x92290D) / 0x9225F9(5.1: 0x922919) / 0x24A9CC`，
+两个铁人控制台点 `0x3329B7 / 0x333D8D`——**两个构建完全相同**，
 AccessInstance RVA `0x5AE7F0 / 0x5AE8A0`，槽位 RVA `0x3153E78 / 0x3154E70`）完全一致，
 见 `..\achievement_unlocker_dll\验证记录_离线扫描.txt`。
+
+## 本次修订（r3，2026-10-02）
+
+**新增两个补丁点，功能是"铁人模式下也能用控制台"**；原来的四个成就补丁一字未改，
+`is_ironman` 触发器**不做修改**。
+
+- 动机与定位：`CGameIdler::Idle` / `CGameIdler::RestoreDeviceObjects` 每帧把
+  `联机 || 铁人` 写进控制台的禁用位（`CConsoleCmdManager+0xA9`）并置位 stay-hidden 闩锁；
+  `CConsoleCmdManager::Execute`（反编译 7946279）与 `CConsole::Show()`（7907204）据此分别
+  拒绝命令与窗口。补丁 5/6 把这两处 `mov reg,1` 的立即数改成 0（各 1 字节），一次解决
+  "命令执行"和"窗口被隐藏"两道闸。
+- 为什么不改 `Execute` 里的两处条件跳转：那样只放开命令执行，界面仍被 stay-hidden 挡住；
+  而 stay-hidden 是每帧重建的，"定时器写内存"式的兜底在这里不成立。
+- 安全性：补丁 6 所在函数里，被改的寄存器（`bl`）在写入后即死，没有别的用途（反汇编确认）；
+  补丁 5 的寄存器本来就只用于这两件事。
+- 跨版本：两条签名在 4.5.0（`D:\zStudy\stellaris\stellaris_4.5.exe`）与 4.5.1（Steam 版）
+  上**都只命中一次，且 RVA 相同**（补丁字节 `0x3329B7 / 0x333D8D`）；"已打过补丁"的形态在
+  两个构建里都不出现，幂等判定干净。离线验证输出见
+  `..\achievement_unlocker_dll\验证记录_离线扫描.txt`。
+- 副作用：禁用位与"联机禁用"共用，联机下的全局封锁同样被解除；但单个命令若自己检查联机
+  标志（3814468 / 3815026 / 3815792）仍会被拦住。
+- 构建标记更新为 `r3 2026-10-02`（写在日志第一行）。
 
 ## 本次修订（r2，2026-09-29）
 
@@ -107,10 +167,18 @@ achievement_unlocker_src/
 ├── README.md              本文件
 ├── src/
 │   ├── dllmain.cpp        DllMain → 工作线程
-│   ├── unlocker.h/.cpp    四个补丁点 + 标志保持循环
+│   ├── unlocker.h/.cpp    六个补丁点 + 标志保持循环
 │   ├── scan.h/.cpp        模式扫描 / 内存写入 / 主模块信息
 │   └── log.h/.cpp         写 achievement_unlocker.log
 └── tools/
     ├── scan_test.cpp      离线验证工具（映射 exe 后跑真实代码）
     └── build_test.bat
+
+achievement_unlocker_dll/
+├── achievement_unlocker.dll
+├── achievement_unlocker.dll.bak_before_console_unlock  r2（加铁人控制台补丁前，回退用）
+├── achievement_unlocker.dll.bak_before_hardening       r1（加固前，更早的回退点）
+├── check_save.py                                   存档自检工具（验证用，见使用说明）
+├── 使用说明.md
+└── 验证记录_离线扫描.txt
 ```

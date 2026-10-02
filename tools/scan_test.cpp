@@ -8,8 +8,8 @@
 // usage:
 //   scan_test <path-to-stellaris.exe>
 //
-// exits 0 when all four sites are found, patched and re-detected as patched,
-// and the achievements manager slot resolves.
+// exits 0 when every site is found, patched and re-detected as patched, and
+// the achievements manager slot resolves.
 #include <windows.h>
 
 #include <cstdint>

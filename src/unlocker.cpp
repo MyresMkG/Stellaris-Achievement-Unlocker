@@ -20,7 +20,8 @@ struct PatchSpec {
   const char* to;
 };
 
-// All four signatures are unique in the 4.5.0 and 4.5.1 game executables.
+// Every signature below matches exactly once in the 4.5.0 and 4.5.1 game
+// executables (verified offline with tools/scan_test.exe).
 const PatchSpec kSpecs[] = {
     // game-file checksum compare: turn "test eax,eax" into "xor eax,eax" so
     // the "checksum modified" verdict never sticks (mods no longer disable
@@ -43,6 +44,29 @@ const PatchSpec kSpecs[] = {
      "0F B6 8E FC 00 00 00 88 88 83 00 00 00",
      "0F B6 8E FC 00 00 00 90 90 90 90 90 90", 7, "88 88 83 00 00 00",
      "90 90 90 90 90 90"},
+    // Ironman console lock. Every frame the game derives "console disabled"
+    // from the ironman flag ([[CGameState+0x9B0]+0x11E]) and stores the result
+    // both into the console command manager and into the console's
+    // stay-hidden latch. Forcing the derived value to 0 makes the console
+    // open and run commands in ironman games; the is_ironman trigger itself
+    // is deliberately left alone. The patched byte is the immediate of
+    // "mov dil,1" in CGameIdler::Idle, the branch taken when the game is
+    // ironman or multiplayer.
+    {"ironman console (idle)",
+     "45 38 BE 80 01 00 00 75 ?? 48 8B 05 ?? ?? ?? ?? 48 8B 88 B0 09 00 00 "
+     "44 38 B9 1E 01 00 00 75 ?? 40 32 FF EB ?? 40 B7 01",
+     "45 38 BE 80 01 00 00 75 ?? 48 8B 05 ?? ?? ?? ?? 48 8B 88 B0 09 00 00 "
+     "44 38 B9 1E 01 00 00 75 ?? 40 32 FF EB ?? 40 B7 00",
+     0x27, "01", "00"},
+    // The same derived value in CGameIdler::RestoreDeviceObjects ("mov bl,1").
+    // bl is dead right after the store there, so the patch has no other
+    // effect.
+    {"ironman console (restore)",
+     "80 BE 80 01 00 00 00 75 ?? 48 8B 05 ?? ?? ?? ?? 48 8B 88 B0 09 00 00 "
+     "80 B9 1E 01 00 00 00 75 ?? 32 DB EB ?? B3 01",
+     "80 BE 80 01 00 00 00 75 ?? 48 8B 05 ?? ?? ?? ?? 48 8B 88 B0 09 00 00 "
+     "80 B9 1E 01 00 00 00 75 ?? 32 DB EB ?? B3 00",
+     0x25, "01", "00"},
 };
 
 // CAchievementsManager::AccessInstance() allocates 0x88 bytes and starts with

@@ -1,5 +1,7 @@
-// The actual achievement-unlock logic: four byte patches plus a monitor that
-// keeps the achievements manager's flag bytes in the "allowed" state.
+// The actual achievement-unlock logic: the byte patches below (four that keep
+// achievements enabled, two that unlock the console in ironman games) plus a
+// monitor that keeps the achievements manager's flag bytes in the "allowed"
+// state.
 #pragma once
 
 #include <cstddef>
@@ -24,8 +26,8 @@ struct ApplyResult {
                                   // whether the two of them agreed
 };
 
-// Applies the four byte patches inside the given image. With write=false
-// nothing is modified; the report describes what would happen.
+// Applies the byte patches inside the given image. With write=false nothing
+// is modified; the report describes what would happen.
 ApplyResult ApplyAll(uint8_t* base, size_t size, bool write);
 
 // Forces the manager flag bytes (80=0 81=1 82=1 83=0 84=0) every interval_ms,
