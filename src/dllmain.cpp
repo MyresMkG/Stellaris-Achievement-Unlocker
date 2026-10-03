@@ -17,7 +17,7 @@ HMODULE g_self = nullptr;
 
 // Identifies the build in the first log line, so a log file can be traced
 // back to the DLL that produced it.
-constexpr char kBuild[] = "r6 2026-10-03";
+constexpr char kBuild[] = "r7 2026-10-03";
 
 // Both switches below are files the user drops next to the DLL, so they can be
 // flipped without rebuilding anything. An unreadable own-path turns both of

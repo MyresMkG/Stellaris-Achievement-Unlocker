@@ -94,6 +94,22 @@ const PatchSpec kSpecs[] = {
      "48 8D 93 20 03 00 00 48 83 7A 18 10 72 03 "
      "48 8B 12 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 31 C0 0F 84 ?? ?? ?? ?? 48 8D",
      29, "85 C0", "31 C0", true},
+    // The notice's second caller: the version-number tooltip, built when the
+    // mouse rests on the version text in the main menu. It asks
+    // IsChecksumOk() and appends the localised "checksum modified" line when
+    // that returns false - the words players actually read. The caller above
+    // does not carry them: on 4.5 it only colours the digest next to the
+    // version number, which is why this point was split off in r7. "or al,1"
+    // pins the predicate's verdict to "ok" for this one display use, so the
+    // tooltip stops claiming a problem the game no longer acts on (patch 1
+    // keeps achievements enabled); no game state changes. Cosmetic for the
+    // same reason as the notice.
+    {"checksum warning (tooltip)",
+     "48 8B 0D ?? ?? ?? ?? 48 81 C1 10 03 00 00 E8 ?? ?? ?? ?? 48 8B C8 "
+     "E8 ?? ?? ?? ?? 84 C0 0F 85 ?? ?? ?? ?? 48 8D 15",
+     "48 8B 0D ?? ?? ?? ?? 48 81 C1 10 03 00 00 E8 ?? ?? ?? ?? 48 8B C8 "
+     "E8 ?? ?? ?? ?? 0C 01 0F 85 ?? ?? ?? ?? 48 8D 15",
+     27, "84 C0", "0C 01", true},
 
     // ------------------------------------------------------------------
     // Fallback signatures. Each one is only consulted when the primary of the
@@ -170,6 +186,19 @@ const PatchSpec kSpecs[] = {
      "48 8D 96 80 02 00 00 48 83 7A 18 10 72 03 "
      "48 8B 12 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 31 C0 0F 84 ?? ?? ?? ?? 48 8D",
      29, "85 C0", "31 C0", true, true},
+    // 4.2.4's copy of the tooltip does not call a predicate at all: it reads
+    // the version string through the application pointer ("mov rdx,[rip] /
+    // add rdx,0x280") and compares it with the constant inline, which is the
+    // second of the two sites the entry above had to tell apart. Its mismatch
+    // block is the one that localises the "checksum modified" line, so forcing
+    // "equal" here silences the tooltip exactly like the notice entry above
+    // silences the version text.
+    {"checksum warning (tooltip)",
+     "48 8B 15 ?? ?? ?? ?? 48 81 C2 80 02 00 00 48 83 7A 18 10 72 03 "
+     "48 8B 12 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 85 C0 0F 84 ?? ?? ?? ?? 48 8D",
+     "48 8B 15 ?? ?? ?? ?? 48 81 C2 80 02 00 00 48 83 7A 18 10 72 03 "
+     "48 8B 12 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 31 C0 0F 84 ?? ?? ?? ?? 48 8D",
+     36, "85 C0", "31 C0", true, true},
 
     // Same idea for the ironman console point: drop the leading
     // "cmp [r14+0x180], r15b / jne" (the multiplayer field offset is the part

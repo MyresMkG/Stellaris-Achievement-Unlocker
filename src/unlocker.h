@@ -1,7 +1,8 @@
 // The actual achievement-unlock logic: the byte patches below (four that keep
-// achievements enabled, two that unlock the console in ironman games, one that
-// silences the now-untrue "checksum modified" notice) plus a monitor that keeps
-// the achievements manager's flag bytes in the "allowed" state.
+// achievements enabled, two that unlock the console in ironman games, two that
+// silence the now-untrue "checksum modified" notice - one in the version text,
+// one in its tooltip) plus a monitor that keeps the achievements manager's
+// flag bytes in the "allowed" state.
 //
 // Most patch points carry fallback signatures next to their primary one, so a
 // game build that moved the code slightly still gets patched instead of

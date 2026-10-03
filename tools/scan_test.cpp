@@ -143,7 +143,8 @@ int main(int argc, char** argv) {
       unlocker::ApplyAll(image.data(), image.size(), false, false);
   Report("pass 4: cosmetic patch off", off, base);
   for (const unlocker::SiteResult& s : off.sites) {
-    const bool cosmetic = s.name == "checksum warning (UI)";
+    const bool cosmetic =
+        s.name == "checksum warning (UI)" || s.name == "checksum warning (tooltip)";
     if (cosmetic ? s.state != "skipped (cosmetic off)" : s.state != "already patched") {
       ok = false;
     }
