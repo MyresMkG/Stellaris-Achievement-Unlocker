@@ -81,7 +81,7 @@ void Report(const char* title, const unlocker::ApplyResult& r, uintptr_t base) {
   std::printf("%s\n", title);
   for (const unlocker::SiteResult& s : r.sites) {
     if (s.patch_address != 0) {
-      std::printf("  %-28s %-18s patch byte rva 0x%zX\n", s.name.c_str(), s.state.c_str(),
+      std::printf("  %-28s %-22s patch byte rva 0x%zX\n", s.name.c_str(), s.state.c_str(),
                   static_cast<size_t>(s.patch_address - base));
     } else {
       std::printf("  %-28s %s\n", s.name.c_str(), s.state.c_str());
@@ -89,9 +89,13 @@ void Report(const char* title, const unlocker::ApplyResult& r, uintptr_t base) {
   }
   std::printf("  %-28s rva 0x%zX\n", "AccessInstance",
               r.access_instance ? static_cast<size_t>(r.access_instance - base) : 0);
-  std::printf("  %-28s rva 0x%zX (%s)\n\n", "manager slot",
+  std::printf("  %-28s rva 0x%zX (%s)\n", "manager slot",
               r.mgr_slot ? static_cast<size_t>(r.mgr_slot - base) : 0,
               r.slot_source.c_str());
+  for (const std::string& note : r.notes) {
+    std::printf("  note: %s\n", note.c_str());
+  }
+  std::printf("\n");
 }
 
 }  // namespace
@@ -132,6 +136,76 @@ int main(int argc, char** argv) {
     if (s.state != "already patched") ok = false;
   }
   if (again.mgr_slot == 0) ok = false;
+
+  // The cosmetic opt-out must leave the other sites alone and only report the
+  // display patch as skipped.
+  const unlocker::ApplyResult off =
+      unlocker::ApplyAll(image.data(), image.size(), false, false);
+  Report("pass 4: cosmetic patch off", off, base);
+  for (const unlocker::SiteResult& s : off.sites) {
+    const bool cosmetic = s.name == "checksum warning (UI)";
+    if (cosmetic ? s.state != "skipped (cosmetic off)" : s.state != "already patched") {
+      ok = false;
+    }
+  }
+
+  // Cross-version checks. The community patch database for this game keeps
+  // per-version patterns and records what actually moved between releases: the
+  // register of the checksum compare's "mov esi,eax" (8B F8 on 4.1.6-4.3,
+  // 8B F0 on 4.5) and, separately, the object offset in front of the ironman
+  // test. Reproduce that drift on the mapped copy - the primary signature then
+  // matches neither its "before" nor its "after" form - and require the
+  // fallback to land on exactly the byte the primary had pinned down. This is
+  // what proves each fallback's delta, which a mere uniqueness scan cannot.
+  struct ByteEdit {
+    size_t off;      // from the start of the primary signature
+    uint8_t value;
+  };
+  const auto drift = [&](const char* title, const char* name, size_t sig_delta,
+                         std::initializer_list<ByteEdit> edits) {
+    const unlocker::SiteResult* site = nullptr;
+    for (const unlocker::SiteResult& s : again.sites) {
+      if (s.name == name) site = &s;
+    }
+    if (site == nullptr || site->patch_address == 0) {
+      std::printf("%s: cannot run, the site did not resolve\n\n", title);
+      ok = false;
+      return;
+    }
+    uint8_t* const sig = reinterpret_cast<uint8_t*>(site->patch_address) - sig_delta;
+    std::vector<uint8_t> saved;
+    for (const ByteEdit& e : edits) {
+      saved.push_back(sig[e.off]);
+      sig[e.off] = e.value;
+    }
+    const unlocker::ApplyResult drifted =
+        unlocker::ApplyAll(image.data(), image.size(), false);
+    Report(title, drifted, base);
+    bool seen = false;
+    for (const unlocker::SiteResult& s : drifted.sites) {
+      if (s.name != name) continue;
+      seen = true;
+      if (s.state != "already patched" || s.patch_address != site->patch_address) {
+        std::printf("  drift: fallback did not recover the site (%s)\n", s.state.c_str());
+        ok = false;
+      }
+    }
+    if (!seen || drifted.notes.empty()) {
+      std::printf("  drift: the fallback was not reported\n");
+      ok = false;
+    }
+    size_t k = 0;
+    for (const ByteEdit& e : edits) sig[e.off] = saved[k++];
+  };
+
+  drift("drift check A: checksum compare register (8B F0 -> 8B F8)",
+        "mods / file checksum", 2, {{1, 0xF8}});
+  drift("drift check B: checksum compare call spelling (E8 -> E9)",
+        "mods / file checksum", 2, {{1, 0xF8}, {10, 0xE9}});
+  drift("drift check C: ironman idle, multiplayer field offset",
+        "ironman console (idle)", 0x27, {{3, 0x88}});
+  drift("drift check D: ironman restore, multiplayer field offset",
+        "ironman console (restore)", 0x25, {{2, 0x88}});
 
   std::printf("%s\n", ok ? "OK" : "FAILED");
   return ok ? 0 : 1;

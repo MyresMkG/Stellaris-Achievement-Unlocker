@@ -4,8 +4,8 @@
 `injected_mods\`，注入器会自动把它注入 `stellaris.exe`。**不修改任何游戏文件**，所有改动
 只在进程内存里，重启游戏即消失。
 
-它解决六件事：前四件对应反编译 `stellaris_4.5_source.cpp` 里成就判定的四个字节，
-后两件解除铁人模式下的控制台封锁：
+它解决七件事：前四件对应反编译 `stellaris_4.5_source.cpp` 里成就判定的四个字节，
+接着两件解除铁人模式下的控制台封锁，最后一件是显示层的收尾：
 
 | # | 补丁 | 运行期签名（名字 = 日志里的名字） | 改动 | 作用 |
 |---|------|--------------------------------------|------|------|
@@ -15,6 +15,11 @@
 | 4 | 读档 → 管理器标记 | `0F B6 8E FC 00 00 00 88 88 83 00 00 00` | 6 字节 → `90`×6 | 加载旧"作弊"存档不再同步禁用标志 |
 | 5 | 铁人控制台 (`ironman console (idle)`) | 见下 | `01` → `00` | 铁人模式下也能打开控制台并执行命令 |
 | 6 | 铁人控制台 (`ironman console (restore)`) | 见下 | `01` → `00` | 同上（第二处，`CGameIdler::RestoreDeviceObjects`） |
+| 7 | 校验和提示 (`checksum warning (UI)`) | 见下 | `85 C0` → `31 C0` | 装了 mod 时不再显示"校验和已修改"（纯显示层，可关） |
+
+补丁 7 是可选项（日志里显示 `skipped (cosmetic off)` 表示关掉了）：在 DLL 旁边放一个
+`achievement_unlocker_keep_checksum_warning.txt` 空文件即可保留原来的提示。它只影响
+"显示哪一段文案"，不影响成就、控制台或任何游戏逻辑。
 
 补丁 5 的签名：
 
@@ -28,6 +33,12 @@
 ```
 80 BE 80 01 00 00 00 75 ?? 48 8B 05 ?? ?? ?? ?? 48 8B 88 B0 09 00 00
 80 B9 1E 01 00 00 00 75 ?? 32 DB EB ?? B3 01
+```
+
+补丁 7 的签名（改的是第 16、17 个字节 `85 C0`）：
+
+```
+48 8B 12 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 85 C0 0F 84 ?? ?? ?? ?? 48 8D
 ```
 
 （注：使用deepseek-v4.1-flash编写，harness为Kimi Code）
@@ -80,8 +91,93 @@
 
 4.5.1 的清单内容（逐条）：`common/`（递归，`.txt` / `.shader` / `.csv`）、
 `events/`（递归，`.txt`）、`map/`（递归，`.shader` / `.txt`）。
-`gfx/ interface/ localisation/ sound/ music/ fonts/ dlc/` 等不在清单里；exe 本体有单独的
-校验和（只出现在版本号显示里），成就判定只比较 **data 校验和**。
+`gfx/ interface/ localisation/ sound/ music/ fonts/ dlc/` 等不在清单里。成就判定只比较
+**data 校验和**。
+
+## 与 Steam 指南 / Stellaris-Exe-Checksum-Patcher 的对照（r4 做的功课）
+
+本项目的补丁点与社区方案逐字节对照过，两个 4.5 构建结论一致：
+
+**1 号补丁 = 社区方案的"必需补丁"。** 指南《How to enable Achievements with ANY mod》
+推荐的自动化工具（`r0fld4nc3/Stellaris-Exe-Checksum-Patcher`，
+`src/patch_patterns/patterns.json`）里唯一标了 `"required": true` 的
+`checksum_patch`，其模式 `488D0D.{8}E8.{8}8B.{2}85C0.{2}0F94.{2}E8` 在两个构建里都
+**只命中一处**，命中地址 `0x1B9492` 正是补丁 1 所在指令序列的头部（`8B F0 85 C0
+41 0F 94 C6`）。静态改 exe 和本 DLL 动的是同一个字节。
+
+**指南正文教人手改的字节是另一处（= 本项目的 7 号补丁）。** 指南让人搜
+`48 8B 12 … 85 C0` 再把 `85 C0` 改成 `33 C0`；那处不是成就判定，而是同一段校验和比较的
+**第二个调用点**：比较相等就跳过版本号旁的"校验和已修改"提示。它同样各只命中一次
+（4.5.0 `0xE9FDE7` / 4.5.1 `0xEA0B07`），r4 起一并处理，并留了开关。
+（`patterns.json` 里 `checksum_warning` 与 `tooltip_patch` 是同一个模式，所以在 4.5 上
+它们打的是同一处。）
+
+**"exe 校验和"这道检查在 4.5 里没有对应物。** 指南评论区说成就指示灯有三道检查
+（exe 校验和 / mod / 控制台）。实测：32 位十六进制校验和常量在整个 exe 里**只有一个**
+（data 校验和，4.5.0 `0x2336830` / 4.5.1 `0x2337830`，就是根目录 `checksum_manifest.txt`
+的 MD5），全镜像只有 4 处 rip 相对引用指向它，逐个反汇编后分别是：
+
+- `0x1B9492` — 补丁 1 的成就判定（所在函数由 `0x1B6F75` 传入成就管理器）；
+- `0xE9FDDB` — 7 号补丁的"校验和已修改"提示文案；
+- `0x1776280` — 产出 `none`/`tips`/`full` 文案的显示路径；
+- `0x1ADE67` — `IsChecksumOk()` 谓词（`0x1ADE60`，7 字节），唯一调用者在 `0xEA0290`，
+  同样是提示文案。
+
+没有任何一处把校验和写进成就管理器。所以"三道检查"落到实处的只有 DLL 已经覆盖的
+**文件校验和**与**控制台**——mod 和文件校验和本来就是同一件事。
+
+（同一条结论在 Linux dump 里也成立：`GetExeChkSum` 的调用者只有遥测上报、上面那串死代码、
+以及多人连接握手的三处日志；`CChecksum::operator==` 会连 name+data+exe 一起比，但只被
+多人兼容性检查调用。成就侧自始至终只读 `GetDataChkSum`。）
+
+## 覆盖度审计：管理器标志字节的每一个写入者
+
+除了上面那次"校验和引用点"穷举，r4 还把 `CAchievementsManager` 的 `+0x81`–`+0x84` 四个标志
+的**所有**写入者找了一遍（Linux dump 全类扫描 + Windows 侧按 `AccessInstance` 的 18 个调用点
+逐个反汇编），结论是 6 个字节补丁覆盖了全部会禁用成就的写入点：
+
+| 偏移 | 写入者 | 条件 | Windows RVA | 覆盖情况 |
+|---|---|---|---|---|
+| `+0x81` | 构造 / `AccessInstance` / `Clear` / `InitFromFile` / `DebugResetAll` | 一律写 **1** | 内联在多处 | 无害（本来就是"允许"） |
+| `+0x82` | `SetValidated(bool)`（唯一实际写入者） | `校验和相符` | `0x1B94D7`（在 `0x1B8EB0` 内） | **补丁 1** |
+| `+0x83` | 控制台命令回调的 lambda | 命令执行成功且非多人 | `0x9225F3` | **补丁 3** |
+| `+0x83` | `CGameState::InitPostRead` | 读档时把 `CGameState+0xFC` 镜像过来 | `0x24A9CC` | **补丁 4** |
+| `+0x84` | `SetDebug(bool)` | 控制台 `debug_achievements` | `0xEBF48A` | 无害（置位反而跳过所有检查） |
+| `+0x80` | **无人写** | — | — | — |
+
+`SetGameOk` / `SetSavegameOk` 在两侧构建里都**没有任何调用者**，`0x81` 也不会被写成 0，
+所以"成就被关掉"只有 `0x82` 变 0 和 `0x83` 变 1 两条路，各自由补丁 1 和补丁 3/4 堵住。
+全 `.text` 里 `mov byte [reg+0x83], imm` 只有 2 处，另一处（`0xB28FA1`）属于另一个
+≥0xcf1 字节的类，从不接触成就管理器单例，已排除。
+
+顺带确认两件与存档有关的事：
+
+- **`I_am_such_a_cheater` 这个 salt 只存在于 Linux 版**：Windows exe 里根本没有这个字符串，
+  也没有带 salt 的校验函数。所以对 Windows 目标而言，存档侧唯一相关的就是 `cheated_on_save`
+  （`CGameState+0xFC`），也就是补丁 2/4 处理的那一个字段。
+- **控制台路径是唯一的**：所有命令都汇入 `CConsole::RunCommandNow` → `CConsoleCmdManager::
+  Execute` → 同一个回调（在 `CInGameIdler` 构造里注册，全局只此一处）。命令失败**不置位**。
+  所以补丁 2/3 天然覆盖全部控制台入口（含 `debugtooltip`、脚本队列、ImGui 调试视图）。
+
+### 已知残留：在"成就被禁用"期间存的档，读回来仍不会解锁
+
+这是审计中唯一没被覆盖的门槛，而且它不是标志位、是**数据**：
+
+- 写档时，`CGameState::WriteMembers` 只有在 `IsAchievementsOk()` 为真时才会写入
+  活跃成就清单（token `0x2fbb`）；成就被禁用期间存的档，这份清单是空/缺失的。
+- 读档时，`CAchievementsManager::OnGameStart(CPdxArray<short> const&)` 只把清单里的条目加进
+  活跃列表，而 `Update()` 只遍历这个活跃列表。于是：**老档 + 补丁齐全，仍然不会跳成就。**
+
+这正好对得上指南评论区说的"存档丢了 `achievement=` 那一行"（应该就是这份清单，
+我们在 token 表里只核实到编号 `0x2fbb`，没能证实它的字符串名）。
+
+DLL **没有**去修它，原因：清单是数据不是立即数，改不了字节；要修得 hook
+`OnGameStart(CPdxArray<short> const&)` 或读档分支，属于"调用游戏函数"的另一类改动，
+在没有实机验证手段的情况下不进这个版本。可行的替代：
+
+- **最简单**：打上补丁后**开新档**，新档会正常写入这份清单；
+- 用 `check_save.py` 看 `achievement markers`：显示 `NONE` 就是这份清单为空（老档），
+  有字段就是好的（新档）。
 
 ## 构建
 
@@ -100,14 +196,95 @@ build_test.bat
 build_test\scan_test.exe <path-to-stellaris.exe>
 ```
 
-`scan_test` 把 exe 按加载布局映射到内存，然后直接调用 DLL 里同一份扫描/补丁代码，跑三遍：
-dry-run → 写补丁 → 再扫描（幂等检查）。报告里除了补丁 RVA，还会打印槽位是怎么定下来的
-（`call site + signature agree` 等），一眼就能看出新增的交叉校验是否生效。两个真实构建
-（4.5.0 / 4.5.1）的输出与预期值（补丁字节 RVA 依次为
-`0x1B94A0 / 0x9225ED(5.1: 0x92290D) / 0x9225F9(5.1: 0x922919) / 0x24A9CC`，
-两个铁人控制台点 `0x3329B7 / 0x333D8D`——**两个构建完全相同**，
-AccessInstance RVA `0x5AE7F0 / 0x5AE8A0`，槽位 RVA `0x3153E78 / 0x3154E70`）完全一致，
-见 `..\achievement_unlocker_dll\验证记录_离线扫描.txt`。
+`scan_test` 把 exe 按加载布局映射到内存，然后直接调用 DLL 里同一份扫描/补丁代码，跑四趟：
+dry-run → 写补丁 → 再扫描（幂等检查）→ 关掉显示层补丁再扫一遍（开关自检）。报告里除了补丁
+RVA，还会打印槽位是怎么定下来的（`call site + signature agree` 等），一眼就能看出交叉校验
+是否生效。三个真实构建的输出与预期值一致（1–7 号点补丁字节 RVA）：
+
+| 目标 | 1–7 号点 | AccessInstance / 槽位 |
+|---|---|---|
+| 4.5.0 | `0x1B94A0 / 0x9225ED / 0x9225F9 / 0x24A9CC / 0x3329B7 / 0x333D8D / 0xE9FDE7` | `0x5AE7F0 / 0x3153E78` |
+| 4.5.1 | `0x1B94A0 / 0x92290D / 0x922919 / 0x24A9CC / 0x3329B7 / 0x333D8D / 0xEA0B07` | `0x5AE8A0 / 0x3154E70` |
+| 4.2.4（r6） | `0x1A4184 / 0x8C422A / 0x8C4236 / 0x22FCB7 / 0x32440E / 0x325B50 / 0xE04002` | `0x57A940 / 0x340A8C8` |
+
+两个铁人控制台点在 4.5.0 / 4.5.1 上完全相同；4.2.4 上 1、3、6 号点本来就命中（1 号与 6 号
+走 r5 的备用签名），r6 把其余四个点接上。完整输出见
+`..\achievement_unlocker_dll\验证记录_离线扫描.txt`。
+
+## 本次修订（r6，2026-10-03）
+
+**支持 4.2.4（Corvus v4.2.4，构建于 2025-12-10）**：给四个点加了 4.2.4 专用备用签名，
+主签名一字未改。1/3/6 号点在 4.2.4 上原本就能定位（1 号与 6 号走 r5 的备用签名）。
+
+- 动机：离线扫描此前的结论是 3/7 个点定位、4 个点 `signature not found`（工具报
+  `FAILED`）。老支线的 `CGameState` 更小，字段偏移整体前移，于是四个点失配。
+- 4.2.4 上移动的字段（都经反汇编确认）：
+  * `cheated` 标志在 `+0xD4`（4.5 是 `+0xFC`）——同时影响控制台回调的写入与读档镜像；
+  * 铁人判定读 `[this+0x158]`、`[[gs+0x928]+0xEE]`，比较用 `r12b`
+    （4.5 是 `+0x180`、`[+0x9B0]+0x11E`、`r15b`）；
+  * 版本提示串在 `+0x280`，prologue 拼作 `lea rdx,[rsi+0x280]`——裸提示签名在 4.2.4
+    命中两处（提示 + 成就 tooltip，与 4.4.1 是同一情形），只有钉住 prologue 的条目能定位。
+- 新增四条备用签名（`console use -> save flag`、`save load -> manager flag`、
+  `ironman console (idle)`、`checksum warning (UI)`），每条都验过：
+  **4.2.4 只命中一次、4.5.0/4.5.1 命中 0 次**。备用签名只在同名主签名完全找不到时才会被
+  查询，所以 4.5.x 上是零行为变化（离线扫描逐行与 r5 相同，一行 note 都不多）。
+- 铁人 idle 那条的三个 disp 只钉最高字节（与 4.4.1 的两条同风格），字段偏移小幅移动时
+  仍能命中；`scan_test` 的 drift check C 改的就是这个字节，4.2.4 上通过。
+- **顺序有讲究**：4.2.4 的四条放在更松的同名备用签名之前。4.2.4 上松的 ironman 模式会
+  同时命中另一处无关站点，那个多余命中只在"真站点未打补丁"时才会被唯一性规则拒掉；
+  钉得住的条目在前，松的就永远轮不到，被静态补丁改过的 4.2.4 也会如实报告
+  `already patched`，而不是写到别处。
+- 离线验证记录新增第三个目标（4.2.4），三个 exe 全部 `OK`；构建标记更新为
+  `r6 2026-10-03`。
+
+## 本次修订（r5，2026-10-03）
+
+**给四个补丁点加了备用签名（fallback）**：1 号点的寄存器/调用拼写、5/6 号点的结构偏移、
+7 号点的前缀，外加 4.4.1（Pegasus）的三种形态。主签名一字未改，4.5.0/4.5.1 上的补丁 RVA
+与 r4 完全一致。
+
+- `PatchSpec` 增加 `fallback` 标志；`ApplyAll` 分两轮：第一轮只跑主签名，第二轮只跑
+  "主签名完全没找到"的点的备用签名。备用签名走同一条 `TrySite` 路径（唯一命中才写、
+  写入前后校验完全一样），所以它不可能抢走主签名已钉住的地址，自己也会被唯一性规则拒绝；
+  真用上时日志多一行 `note: <补丁点名字>: primary signature gone, a fallback matched`。
+- 依据是社区工具 `Stellaris-Exe-Checksum-Patcher` 的按版本模式库：会漂移的字节是 1 号点
+  `mov` 的寄存器（4.1.6–4.3 是 `8B F8`）与 7 号点的前缀形状。
+- `scan_test` 新增 4 组 drift check（人为制造漂移，要求备用签名落回主签名钉住的同一个
+  字节，这是唯一能证明 delta 正确的方法），两个 4.5 构建都通过；细节见
+  `..\achievement_unlocker_dll\验证记录_离线扫描.txt` 的《跨版本兼容》一节。
+- 构建标记更新为 `r5 2026-10-03`。
+
+## 本次修订（r4，2026-10-03）
+
+**对照 Steam 指南与 Stellaris-Exe-Checksum-Patcher 之后，新增 7 号补丁点（"校验和已修改"
+提示），并把它做成可关的显示层补丁**；1–6 号补丁的字节与 RVA 一字未改。
+
+- 新补丁点签名 `48 8B 12 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 85 C0 0F 84 ?? ?? ?? ??
+  48 8D`，把 `85 C0` 改成 `31 C0`——这就是指南正文教人手改的那个字节（指南写作
+  `48 8B 12 … 85 C0` → `33 C0`）。反汇编确认：该比较相等时跳过的正是"追加提示文案"的那段
+  代码，所以补丁只让版本号旁不再附加"校验和已修改"；校验和本身照算照比，成就判定
+  （1 号点）是完全不同的调用点。
+- 为什么加它：装了 mod、1 号点生效之后，"校验和已修改"这句话就不成立了——成就并没有被
+  禁用，留着只会误导（r3 的使用说明里专门提醒过这一点）。社区两个独立方案都打这一处。
+  它不影响任何游戏逻辑，所以标成"显示层"：在 DLL 旁边放一个
+  `achievement_unlocker_keep_checksum_warning.txt` 就保留原提示。
+- 覆盖度核查（r4 的主要工作）：全 exe 只有**一个** 32 位十六进制校验和常量，只有 4 处代码
+  引用它，其中**只有 1 处**通向成就管理器（= 1 号点），其余 3 处都是显示路径（7 号点、
+  `none`/`tips`/`full` 文案、`IsChecksumOk()` 谓词）。详见上面
+  《与 Steam 指南 / Stellaris-Exe-Checksum-Patcher 的对照》。
+- 另外把管理器 `+0x81`–`+0x84` 四个标志的**所有**写入者穷举了一遍（Windows 侧按
+  `AccessInstance` 的 18 个调用点逐个反汇编），确认 6 个字节补丁覆盖了全部会禁用成就的写入
+  点；`SetGameOk` / `SetSavegameOk` 在两侧构建里都没有调用者，`+0x80` 无人写。见上面
+  《覆盖度审计》。
+- **记录一条已知残留（本轮没修）**：在"成就被禁用"期间存的档，活跃成就清单（token `0x2fbb`）
+  是空的，补齐丁读回来仍然不会解锁。它是数据不是立即数，改不了字节；要修得 hook 游戏函数，
+  没有实机验证手段就不进这个版本。**替代做法是打上补丁后开新档**，细节见《覆盖度审计》。
+- 存档侧另外确认：`I_am_such_a_cheater` 这个 salt 只存在于 Linux 版，Windows exe 里既没有该
+  字符串也没有带 salt 的校验函数，所以 Windows 上存档侧唯一相关的字段就是补丁 2/4 处理的
+  `cheated_on_save`。
+- 离线工具加了第 4 趟：关掉显示层补丁再扫一遍，确认只有 7 号点变成
+  `skipped (cosmetic off)`，其余点不受影响。
+- 构建标记更新为 `r4 2026-10-03`；日志里补丁名一列的宽度从 26 放宽到 30。
 
 ## 本次修订（r3，2026-10-02）
 
@@ -166,8 +343,8 @@ achievement_unlocker_src/
 ├── build.bat              MinGW-w64 构建脚本
 ├── README.md              本文件
 ├── src/
-│   ├── dllmain.cpp        DllMain → 工作线程
-│   ├── unlocker.h/.cpp    六个补丁点 + 标志保持循环
+│   ├── dllmain.cpp        DllMain → 工作线程（两个开关文件）
+│   ├── unlocker.h/.cpp    七个补丁点 + 标志保持循环
 │   ├── scan.h/.cpp        模式扫描 / 内存写入 / 主模块信息
 │   └── log.h/.cpp         写 achievement_unlocker.log
 └── tools/
@@ -176,9 +353,20 @@ achievement_unlocker_src/
 
 achievement_unlocker_dll/
 ├── achievement_unlocker.dll
-├── achievement_unlocker.dll.bak_before_console_unlock  r2（加铁人控制台补丁前，回退用）
-├── achievement_unlocker.dll.bak_before_hardening       r1（加固前，更早的回退点）
+├── achievement_unlocker.dll.bak_before_corvus_fallbacks  r5（加 4.2.4 备用签名前，回退用）
+├── achievement_unlocker.dll.bak_before_fallbacks         r4（加备用签名前）
+├── achievement_unlocker.dll.bak_before_warning_patch     r3（加显示层补丁前，回退用）
+├── achievement_unlocker.dll.bak_before_console_unlock    r2（加铁人控制台补丁前）
+├── achievement_unlocker.dll.bak_before_hardening         r1（加固前，更早的回退点）
 ├── check_save.py                                   存档自检工具（验证用，见使用说明）
 ├── 使用说明.md
 └── 验证记录_离线扫描.txt
 ```
+
+两个开关文件都放在 DLL 旁边（也就是 `injected_mods\`），放上即生效、删掉即恢复：
+
+| 文件 | 作用 |
+|------|------|
+| `achievement_unlocker_probe_only.txt` | 只解析地址、写日志，一个字节都不改 |
+| `achievement_unlocker_keep_checksum_warning.txt` | 保留"校验和已修改"提示（关掉 7 号显示层补丁） |
+
