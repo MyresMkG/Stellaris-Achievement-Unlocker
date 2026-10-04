@@ -1,5 +1,7 @@
 # achievement_unlocker —— 运行时成就解锁 + 铁人控制台解锁 DLL
 
+（注：使用deepseek-v4.1-flash编写，harness为Kimi Code）
+
 配合 `stellaris_mod_injector` 使用：把编译好的 `achievement_unlocker.dll` 放进游戏根目录的
 `injected_mods\`，注入器会自动把它注入 `stellaris.exe`。**不修改任何游戏文件**，所有改动
 只在进程内存里，重启游戏即消失。
@@ -63,8 +65,6 @@ E8 ?? ?? ?? ?? 84 C0 0F 85 ?? ?? ?? ?? 48 8D 15
 48 8B 15 ?? ?? ?? ?? 48 81 C2 80 02 00 00 48 83 7A 18 10 72 03
 48 8B 12 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 85 C0 0F 84 ?? ?? ?? ?? 48 8D
 ```
-
-（注：使用deepseek-v4.1-flash编写，harness为Kimi Code）
 
 ### 铁人控制台补丁（5/6）的原理
 
