@@ -1,0 +1,242 @@
+﻿{
+    "build":  "r9.2 2026-11-19",
+    "dll_sha256":  "7f0f3de64be1bec8b871e9d79b9d652873918fbb4e10b125b4012f0d54b6097b",
+    "scan_test_sha256":  "24ceeb557ecb1960dadddaaa497858c250263bc15299ecd5f4ecefd5abd1e096",
+    "excluded":  "3.14.*",
+    "test_scope":  "Offline mapped-image dry run, writes, idempotency, cosmetic opt-out, four drift checks, old-save repair hook locator",
+    "in_game_tested_this_revision":  false,
+    "in_game_probe_note":  "r9: injected into Stellaris 4.5.4 (Cygnus) and reached the main menu. The old-save repair hook reported hooked (Update 0x5B2D60, OnGameStart 0x5B30D0, call 0x2600C3) and the process ran without error. No save was loaded, so neither the rebuild nor the Steam backend was exercised.",
+    "passed":  true,
+    "versions":  [
+                     {
+                         "file":  "stellaris_4.2.4.exe",
+                         "sha256":  "07cdd628aeadfd56882ab1f5d82e28078b4f3250a57bf1abae9751781a32e777",
+                         "exit_code":  0,
+                         "passed":  true,
+                         "patch_sites":  [
+                                             "  mods / file checksum         would patch            patch byte rva 0x1A4184",
+                                             "  console use -\u003e save flag     would patch            patch byte rva 0x8C422A",
+                                             "  console use -\u003e manager flag  would patch            patch byte rva 0x8C4236",
+                                             "  save load -\u003e manager flag    would patch            patch byte rva 0x22FCB7",
+                                             "  ironman console (idle)       would patch            patch byte rva 0x32440E",
+                                             "  ironman console (restore)    would patch            patch byte rva 0x325B50",
+                                             "  checksum warning (UI)        would patch            patch byte rva 0xE04002",
+                                             "  checksum warning (tooltip)   would patch            patch byte rva 0xE04AC6"
+                                         ],
+                         "manager":  [
+                                         "  AccessInstance               rva 0x57A940",
+                                         "  manager slot                 rva 0x340A8C8 (call site + signature agree)"
+                                     ],
+                         "hook":  [
+                                      "  old-save repair hook         would hook             Update 0x57A9E0, OnGameStart 0x57AF80, call 0x2482F2"
+                                  ]
+                     },
+                     {
+                         "file":  "stellaris_4.4.1.exe",
+                         "sha256":  "3687394585bce4ea6a93fac847cc625cab412e846d892361806c9c1cacdadb58",
+                         "exit_code":  0,
+                         "passed":  true,
+                         "patch_sites":  [
+                                             "  mods / file checksum         would patch            patch byte rva 0x1BE39E",
+                                             "  console use -\u003e save flag     would patch            patch byte rva 0x97624D",
+                                             "  console use -\u003e manager flag  would patch            patch byte rva 0x976259",
+                                             "  save load -\u003e manager flag    would patch            patch byte rva 0x24ECF7",
+                                             "  ironman console (idle)       would patch            patch byte rva 0x334ABE",
+                                             "  ironman console (restore)    would patch            patch byte rva 0x33616D",
+                                             "  checksum warning (UI)        would patch            patch byte rva 0xF111AC",
+                                             "  checksum warning (tooltip)   would patch            patch byte rva 0xF11ACD"
+                                         ],
+                         "manager":  [
+                                         "  AccessInstance               rva 0x5DA240",
+                                         "  manager slot                 rva 0x336B0E8 (call site + signature agree)"
+                                     ],
+                         "hook":  [
+                                      "  old-save repair hook         would hook             Update 0x5DA2E0, OnGameStart 0x5DA540, call 0x263C00"
+                                  ]
+                     },
+                     {
+                         "file":  "stellaris_4.4.2.exe",
+                         "sha256":  "0f45522ca7fb4d6d6c8607b23ff4e5af67224ff8520375c5442f18d51f3b1c4a",
+                         "exit_code":  0,
+                         "passed":  true,
+                         "patch_sites":  [
+                                             "  mods / file checksum         would patch            patch byte rva 0x1BE39E",
+                                             "  console use -\u003e save flag     would patch            patch byte rva 0x97622D",
+                                             "  console use -\u003e manager flag  would patch            patch byte rva 0x976239",
+                                             "  save load -\u003e manager flag    would patch            patch byte rva 0x24ECE7",
+                                             "  ironman console (idle)       would patch            patch byte rva 0x334AAE",
+                                             "  ironman console (restore)    would patch            patch byte rva 0x33615D",
+                                             "  checksum warning (UI)        would patch            patch byte rva 0xF1100C",
+                                             "  checksum warning (tooltip)   would patch            patch byte rva 0xF1192D"
+                                         ],
+                         "manager":  [
+                                         "  AccessInstance               rva 0x5DA180",
+                                         "  manager slot                 rva 0x336B0F8 (call site + signature agree)"
+                                     ],
+                         "hook":  [
+                                      "  old-save repair hook         would hook             Update 0x5DA220, OnGameStart 0x5DA480, call 0x263BF0"
+                                  ]
+                     },
+                     {
+                         "file":  "stellaris_4.4.4.exe",
+                         "sha256":  "9242c40abb78b53e88039ead1270ad82eb003959fb2d413c856d280ea02b1a56",
+                         "exit_code":  0,
+                         "passed":  true,
+                         "patch_sites":  [
+                                             "  mods / file checksum         would patch            patch byte rva 0x1BEBDE",
+                                             "  console use -\u003e save flag     would patch            patch byte rva 0x9791FD",
+                                             "  console use -\u003e manager flag  would patch            patch byte rva 0x979209",
+                                             "  save load -\u003e manager flag    would patch            patch byte rva 0x24FDF7",
+                                             "  ironman console (idle)       would patch            patch byte rva 0x335CEE",
+                                             "  ironman console (restore)    would patch            patch byte rva 0x33739D",
+                                             "  checksum warning (UI)        would patch            patch byte rva 0xF1751C",
+                                             "  checksum warning (tooltip)   would patch            patch byte rva 0xF17E3D"
+                                         ],
+                         "manager":  [
+                                         "  AccessInstance               rva 0x5DC0D0",
+                                         "  manager slot                 rva 0x33775F8 (call site + signature agree)"
+                                     ],
+                         "hook":  [
+                                      "  old-save repair hook         would hook             Update 0x5DC170, OnGameStart 0x5DC3D0, call 0x264EA0"
+                                  ]
+                     },
+                     {
+                         "file":  "stellaris_4.4.5.exe",
+                         "sha256":  "6d287f06b83c7fcb69a042477e1b3c0537c846022a6777bab2bc396781977357",
+                         "exit_code":  0,
+                         "passed":  true,
+                         "patch_sites":  [
+                                             "  mods / file checksum         would patch            patch byte rva 0x1BFCEE",
+                                             "  console use -\u003e save flag     would patch            patch byte rva 0x9808FD",
+                                             "  console use -\u003e manager flag  would patch            patch byte rva 0x980909",
+                                             "  save load -\u003e manager flag    would patch            patch byte rva 0x25156C",
+                                             "  ironman console (idle)       would patch            patch byte rva 0x3375FE",
+                                             "  ironman console (restore)    would patch            patch byte rva 0x338CAD",
+                                             "  checksum warning (UI)        would patch            patch byte rva 0xF2556C",
+                                             "  checksum warning (tooltip)   would patch            patch byte rva 0xF25E8D"
+                                         ],
+                         "manager":  [
+                                         "  AccessInstance               rva 0x5DFB80",
+                                         "  manager slot                 rva 0x339DE00 (call site + signature agree)"
+                                     ],
+                         "hook":  [
+                                      "  old-save repair hook         would hook             Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820"
+                                  ]
+                     },
+                     {
+                         "file":  "stellaris_4.4.6.exe",
+                         "sha256":  "bc451c72d9654c8901f1bb0bee1dd78d76f415465c2fbf746e9f98ade333173a",
+                         "exit_code":  0,
+                         "passed":  true,
+                         "patch_sites":  [
+                                             "  mods / file checksum         would patch            patch byte rva 0x1BFCEE",
+                                             "  console use -\u003e save flag     would patch            patch byte rva 0x9808FD",
+                                             "  console use -\u003e manager flag  would patch            patch byte rva 0x980909",
+                                             "  save load -\u003e manager flag    would patch            patch byte rva 0x25156C",
+                                             "  ironman console (idle)       would patch            patch byte rva 0x3375FE",
+                                             "  ironman console (restore)    would patch            patch byte rva 0x338CAD",
+                                             "  checksum warning (UI)        would patch            patch byte rva 0xF2563C",
+                                             "  checksum warning (tooltip)   would patch            patch byte rva 0xF25F5D"
+                                         ],
+                         "manager":  [
+                                         "  AccessInstance               rva 0x5DFB80",
+                                         "  manager slot                 rva 0x339DDC0 (call site + signature agree)"
+                                     ],
+                         "hook":  [
+                                      "  old-save repair hook         would hook             Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820"
+                                  ]
+                     },
+                     {
+                         "file":  "stellaris_4.5.1.exe",
+                         "sha256":  "6fe06709f265e726722dc23f617c5fc4e5557629e2d43fe312016aba547c83e4",
+                         "exit_code":  0,
+                         "passed":  true,
+                         "patch_sites":  [
+                                             "  mods / file checksum         would patch            patch byte rva 0x1B94A0",
+                                             "  console use -\u003e save flag     would patch            patch byte rva 0x92290D",
+                                             "  console use -\u003e manager flag  would patch            patch byte rva 0x922919",
+                                             "  save load -\u003e manager flag    would patch            patch byte rva 0x24A9CC",
+                                             "  ironman console (idle)       would patch            patch byte rva 0x3329B7",
+                                             "  ironman console (restore)    would patch            patch byte rva 0x333D8D",
+                                             "  checksum warning (UI)        would patch            patch byte rva 0xEA0B07",
+                                             "  checksum warning (tooltip)   would patch            patch byte rva 0xEA1366"
+                                         ],
+                         "manager":  [
+                                         "  AccessInstance               rva 0x5AE8A0",
+                                         "  manager slot                 rva 0x3154E70 (call site + signature agree)"
+                                     ],
+                         "hook":  [
+                                      "  old-save repair hook         would hook             Update 0x5AE940, OnGameStart 0x5AECB0, call 0x25F013"
+                                  ]
+                     },
+                     {
+                         "file":  "stellaris_4.5.2.exe",
+                         "sha256":  "400df27c82ddc845aa9dce79bd468d81f18f060d299cd263e3afa93aef4f7a83",
+                         "exit_code":  0,
+                         "passed":  true,
+                         "patch_sites":  [
+                                             "  mods / file checksum         would patch            patch byte rva 0x1B97E0",
+                                             "  console use -\u003e save flag     would patch            patch byte rva 0x9219AD",
+                                             "  console use -\u003e manager flag  would patch            patch byte rva 0x9219B9",
+                                             "  save load -\u003e manager flag    would patch            patch byte rva 0x24AFFC",
+                                             "  ironman console (idle)       would patch            patch byte rva 0x332FB7",
+                                             "  ironman console (restore)    would patch            patch byte rva 0x33438D",
+                                             "  checksum warning (UI)        would patch            patch byte rva 0xEA1267",
+                                             "  checksum warning (tooltip)   would patch            patch byte rva 0xEA1AC6"
+                                         ],
+                         "manager":  [
+                                         "  AccessInstance               rva 0x5AEB00",
+                                         "  manager slot                 rva 0x3155B38 (call site + signature agree)"
+                                     ],
+                         "hook":  [
+                                      "  old-save repair hook         would hook             Update 0x5AEBA0, OnGameStart 0x5AEF10, call 0x25F623"
+                                  ]
+                     },
+                     {
+                         "file":  "stellaris_4.5.3.exe",
+                         "sha256":  "2f0fc2a91ccec9f77d390a5d198195927158c22444216a03596a23007fb3eafb",
+                         "exit_code":  0,
+                         "passed":  true,
+                         "patch_sites":  [
+                                             "  mods / file checksum         would patch            patch byte rva 0x1B96F0",
+                                             "  console use -\u003e save flag     would patch            patch byte rva 0x92363D",
+                                             "  console use -\u003e manager flag  would patch            patch byte rva 0x923649",
+                                             "  save load -\u003e manager flag    would patch            patch byte rva 0x24B0BC",
+                                             "  ironman console (idle)       would patch            patch byte rva 0x3339A7",
+                                             "  ironman console (restore)    would patch            patch byte rva 0x334D7D",
+                                             "  checksum warning (UI)        would patch            patch byte rva 0xEA6C57",
+                                             "  checksum warning (tooltip)   would patch            patch byte rva 0xEA74B6"
+                                         ],
+                         "manager":  [
+                                         "  AccessInstance               rva 0x5AFB40",
+                                         "  manager slot                 rva 0x315AB38 (call site + signature agree)"
+                                     ],
+                         "hook":  [
+                                      "  old-save repair hook         would hook             Update 0x5AFBE0, OnGameStart 0x5AFF50, call 0x25FC23"
+                                  ]
+                     },
+                     {
+                         "file":  "stellaris_4.5.4.exe",
+                         "sha256":  "10d2613a392fe8ac7982701899dc2e43ebf4c1c721ea1baeba6c3fb25db36eb1",
+                         "exit_code":  0,
+                         "passed":  true,
+                         "patch_sites":  [
+                                             "  mods / file checksum         would patch            patch byte rva 0x1B9700",
+                                             "  console use -\u003e save flag     would patch            patch byte rva 0x924F8D",
+                                             "  console use -\u003e manager flag  would patch            patch byte rva 0x924F99",
+                                             "  save load -\u003e manager flag    would patch            patch byte rva 0x24B06C",
+                                             "  ironman console (idle)       would patch            patch byte rva 0x336C07",
+                                             "  ironman console (restore)    would patch            patch byte rva 0x337FDD",
+                                             "  checksum warning (UI)        would patch            patch byte rva 0xEA8437",
+                                             "  checksum warning (tooltip)   would patch            patch byte rva 0xEA8C96"
+                                         ],
+                         "manager":  [
+                                         "  AccessInstance               rva 0x5B2CC0",
+                                         "  manager slot                 rva 0x315CB78 (call site + signature agree)"
+                                     ],
+                         "hook":  [
+                                      "  old-save repair hook         would hook             Update 0x5B2D60, OnGameStart 0x5B30D0, call 0x2600C3"
+                                  ]
+                     }
+                 ]
+}

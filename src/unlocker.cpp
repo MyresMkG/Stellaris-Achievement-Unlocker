@@ -43,12 +43,18 @@ const PatchSpec kSpecs[] = {
     // that instruction ever changes shape.
     {"console use -> manager flag",
      "C6 80 83 00 00 00 01", "C6 80 83 00 00 00 00", 6, "01", "00"},
-    // loading a save that was marked "cheated" no longer copies that flag
-    // into the achievements manager.
+    // Loading a save that was marked "cheated" no longer copies that flag into
+    // the achievements manager. The store is skipped with a two-byte "jmp +4"
+    // instead of being overwritten with six nops: two bytes always fit inside
+    // one naturally aligned 8-byte block, so the write is a single atomic store
+    // on every build. The six-byte form straddled an 8-byte block boundary -
+    // and on 4.5.2/4.5.3 a 64-byte cache line as well - which pushed the write
+    // onto the plain memcpy path that WriteBytes exists to avoid. The bytes the
+    // jump skips stay untouched, so the idempotency pattern stops right after
+    // them instead of pinning them.
     {"save load -> manager flag",
      "0F B6 8E FC 00 00 00 88 88 83 00 00 00",
-     "0F B6 8E FC 00 00 00 90 90 90 90 90 90", 7, "88 88 83 00 00 00",
-     "90 90 90 90 90 90"},
+     "0F B6 8E FC 00 00 00 EB 04", 7, "88 88", "EB 04"},
     // Ironman console lock. Every frame the game derives "console disabled"
     // from the ironman flag ([[CGameState+0x9B0]+0x11E]) and stores the result
     // both into the console command manager and into the console's
@@ -168,8 +174,8 @@ const PatchSpec kSpecs[] = {
      6, "01", "00", false, true},
     {"save load -> manager flag",
      "0F B6 8C 24 D4 00 00 00 88 88 83 00 00 00",
-     "0F B6 8C 24 D4 00 00 00 90 90 90 90 90 90",
-     8, "88 88 83 00 00 00", "90 90 90 90 90 90", false, true},
+     "0F B6 8C 24 D4 00 00 00 EB 04",
+     8, "88 88", "EB 04", false, true},
     {"ironman console (idle)",
      "45 38 A6 ?? ?? ?? 00 75 ?? 48 8B 05 ?? ?? ?? ?? 48 8B 88 ?? ?? ?? 00 "
      "44 38 A1 ?? ?? ?? 00 75 ?? 40 32 FF EB ?? 40 B7 01",
@@ -223,8 +229,17 @@ const PatchSpec kSpecs[] = {
     // nowhere in 4.5, so adding them cannot change 4.5 behaviour.
     {"save load -> manager flag",
      "0F B6 8C 24 FC 00 00 00 88 88 83 00 00 00",
-     "0F B6 8C 24 FC 00 00 00 90 90 90 90 90 90",
-     8, "88 88 83 00 00 00", "90 90 90 90 90 90", false, true},
+     "0F B6 8C 24 FC 00 00 00 EB 04",
+     8, "88 88", "EB 04", false, true},
+    // 4.4.1-4.4.6 inline the tooltip compare like 4.2.4, with the checksum
+    // string at +0x320 instead of +0x280. Keep that displacement explicit so
+    // the version-text caller cannot be mistaken for the tooltip.
+    {"checksum warning (tooltip)",
+     "48 8B 15 ?? ?? ?? ?? 48 81 C2 20 03 00 00 48 83 7A 18 10 72 03 "
+     "48 8B 12 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 85 C0 0F 84 ?? ?? ?? ?? 48 8D",
+     "48 8B 15 ?? ?? ?? ?? 48 81 C2 20 03 00 00 48 83 7A 18 10 72 03 "
+     "48 8B 12 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 31 C0 0F 84 ?? ?? ?? ?? 48 8D",
+     36, "85 C0", "31 C0", true, true},
     // The two ironman points with both structure offsets left open - only the
     // top byte of each disp is pinned, which is what keeps the pattern unique
     // in either build. Each lands on the same byte its 4.5 primary patches
@@ -297,6 +312,38 @@ bool MatchesAt(uint8_t* p, uintptr_t base, size_t size, const char* sig) {
   return true;
 }
 
+// True when t is the entry of CAchievementsManager::AccessInstance(). The
+// signature pins the "mov rax,[slot]; test; jne; mov ecx,0x88; call operator_new"
+// that starts the work, but not the function: every build verified so far opens
+// with a four-byte frame allocation ("sub rsp,0x28") in front of that load, so
+// the signature hit is a few bytes inside the entry and must not be used as the
+// entry itself.
+bool LooksLikeAccessInstance(uintptr_t t, uintptr_t base, size_t size) {
+  if (!InRange(t, base, size)) return false;
+  const uintptr_t load = FindMovRaxRip(reinterpret_cast<uint8_t*>(t), 0x10);
+  return load != 0 && MatchesAt(reinterpret_cast<uint8_t*>(load), base, size, kMgrSlotSig);
+}
+
+// The direct call to AccessInstance() that sits beside a patch point, found by
+// the shape of its target rather than by a fixed offset. The offset matters:
+// the checksum point has a fallback spelling whose "call" sits one byte earlier
+// than the primary's, so "match + 8" lands inside that call's displacement (4.2.4
+// resolves the point through exactly that fallback). Trusting whatever byte sits
+// at a fixed offset there could hand back an address that merely happens to be
+// inside the image; a candidate whose target does not look like AccessInstance
+// is never accepted.
+uintptr_t CallToAccessInstance(uint8_t* at, uintptr_t base, size_t size, size_t span,
+                               bool forward) {
+  for (size_t i = 0; i + 5 <= span; ++i) {
+    uint8_t* const p = forward ? at + i : at - i;
+    if (!InRange(reinterpret_cast<uintptr_t>(p), base, size)) break;
+    if (*p != 0xE8) continue;
+    const uintptr_t t = CallTarget(p, base, size);
+    if (t != 0 && LooksLikeAccessInstance(t, base, size)) return t;
+  }
+  return 0;
+}
+
 // Locates and (optionally) applies one signature. Everything that decides
 // whether a write happens lives here, so a fallback signature goes through
 // exactly the same checks as a primary one.
@@ -354,6 +401,414 @@ const SiteResult* FindSite(const std::vector<SiteResult>& sites, const char* nam
     if (s.name == name) return &s;
   }
   return nullptr;
+}
+
+// ---------------------------------------------------------------------------
+// Rebuilding the active achievement list of a save that was written while
+// achievements were disabled.
+//
+// Such a save carries no 0x2fbb list. Loading it leaves the manager's active
+// list at zero entries, and Update() - the only place that can unlock anything
+// - iterates exactly that list, so nothing unlocks for the rest of the
+// session. No byte patch helps here: the missing list is data, not a flag.
+//
+// The game has a second builder that never looks at the save: the one used
+// when a new game starts, OnGameStart(CEventScope&). It walks the achievement
+// catalogue (read from common/achievements.txt at startup), skips entries
+// Steam already reports as unlocked, and honours each entry's "possible"
+// block. Calling it once after a load rebuilds the list, and the next save
+// writes 0x2fbb again - which repairs the save for good.
+//
+// Update(CEventScope&) is the only caller that already has a live scope in
+// hand, so it is the natural place to do that. Rather than hooking its
+// prologue (this tool has no disassembler to copy instructions with), the
+// single call to it is retargeted: four bytes, no trampoline, and RCX/RDX
+// already hold (manager, scope) - exactly what the rebuild needs.
+//
+// Locating, without a version table:
+//   * OnGameStart zeroes its two counters (+0x44, +0x7c) before anything else,
+//     so a call target whose first 0x40 bytes contain both "89 ?? 44" and
+//     "89 ?? 7c" is a candidate;
+//   * Update tests [this+0x85] immediately before calling it, so the candidate
+//     call is the one preceded by "85 00 00 00" and a short jcc;
+//   * Update's entry is the nearest function start above that call, and it
+//     must look like a prologue (stack allocation or register spill);
+//   * the instruction to retarget is the image's single direct call to Update,
+//     and an AccessInstance call must sit within 64 bytes in front of it - that
+//     is what makes it the achievements pump rather than some other caller.
+// Verified against 4.2.4, 4.4.1-4.4.6 and 4.5.1-4.5.4: one candidate, one
+// guarded call, one call site and the AccessInstance call 15 bytes before it
+// in every build. Refusing beats guessing: if any of the five checks fails,
+// nothing is retargeted and the other eight patches carry on.
+// ---------------------------------------------------------------------------
+
+constexpr size_t kActiveCount = 0x44;  // CAchievementsManager +0x44
+
+using UpdateFn = void (*)(void*, void*);
+UpdateFn g_real_update = nullptr;
+UpdateFn g_real_on_game_start = nullptr;
+uintptr_t g_hook_base = 0;
+size_t g_hook_size = 0;
+uint8_t* g_hook_stub = nullptr;  // set once the call site has been retargeted
+
+// A DLL is not guaranteed to land within the +/-2 GB a rel32 call can reach,
+// so the call site is pointed at a three-instruction stub allocated near it:
+// mov rax, <hook>; jmp rax. The stack already holds the return address, so the
+// hook returns straight to the original caller.
+uint8_t* AllocNear(uintptr_t target, size_t n) {
+  SYSTEM_INFO si;
+  GetSystemInfo(&si);
+  const uintptr_t gran = si.dwAllocationGranularity ? si.dwAllocationGranularity : 0x10000;
+  const uintptr_t lo = reinterpret_cast<uintptr_t>(si.lpMinimumApplicationAddress);
+  const uintptr_t hi = reinterpret_cast<uintptr_t>(si.lpMaximumApplicationAddress);
+  for (uintptr_t d = gran; d < 0x70000000ull; d += gran) {
+    for (int up = 0; up < 2; ++up) {
+      const uintptr_t cand = up ? target + d : target - d;
+      if (cand < lo || cand + n > hi) continue;
+      void* const p = VirtualAlloc(reinterpret_cast<void*>(cand), n,
+                                   MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+      if (p != nullptr) return static_cast<uint8_t*>(p);
+    }
+  }
+  return nullptr;
+}
+
+struct CallRef {
+  uint8_t* at = nullptr;
+  uintptr_t target = 0;
+};
+
+bool LooksLikeManager(const uint8_t* mgr, uintptr_t base, size_t size) {
+  uintptr_t vtbl = 0;
+  std::memcpy(&vtbl, mgr, sizeof(vtbl));
+  if (!InRange(vtbl, base, size)) return false;
+  for (int k = 0x81; k <= 0x84; ++k) {
+    if (mgr[k] > 1) return false;
+  }
+  return true;
+}
+
+// "mov dword [reg+0x44], reg32" immediately followed by the same for +0x7c:
+// the two list counters OnGameStart clears before it does anything else.
+bool HasZeroedCounters(const uint8_t* p, size_t n) {
+  for (size_t i = 0; i + 6 <= n; ++i) {
+    if (p[i] == 0x89 && p[i + 2] == 0x44 && p[i + 3] == 0x89 && p[i + 5] == 0x7C) return true;
+  }
+  return false;
+}
+
+// The "cmp byte [reg+0x85], 0" that guards the OnGameStart call inside Update,
+// followed by a short jcc (je or jne depending on how the guard was spelled).
+bool GuardsOnGameStart(const uint8_t* at, const uint8_t* lower) {
+  const uint8_t* first = (at - lower > 48) ? at - 48 : lower;
+  for (const uint8_t* p = first; p + 4 <= at; ++p) {
+    if (p[0] != 0x85 || p[1] != 0x00 || p[2] != 0x00 || p[3] != 0x00) continue;
+    bool jcc = false;
+    for (const uint8_t* q = p + 4; q < at; ++q) {
+      if (*q == 0x74 || *q == 0x75) {
+        jcc = true;
+        break;
+      }
+    }
+    // A decoy earlier in the window must not end the search: the real guard is
+    // seven to nine bytes before the call, so a false "85 00 00 00" in front of
+    // it used to swallow the whole pattern.
+    if (jcc) return true;
+  }
+  return false;
+}
+
+// A function entry this tool is willing to retarget must look like a real
+// prologue: a stack allocation or a register spill within the first 0x30
+// bytes. Covers 4.2.4 (spill first), 4.4.x ("sub rsp, imm8") and 4.5.x
+// (spill, then "sub rsp, imm32" at +0x16).
+bool LooksLikeFunctionEntry(const uint8_t* p) {
+  for (size_t i = 0; i + 4 <= 0x30; ++i) {
+    if (p[i] == 0x48 && p[i + 1] == 0x83 && p[i + 2] == 0xEC) return true;
+    if (p[i] == 0x48 && p[i + 1] == 0x81 && p[i + 2] == 0xEC) return true;
+    if (p[i] == 0x48 && p[i + 1] == 0x89 && p[i + 2] == 0x5C && p[i + 3] == 0x24) return true;
+  }
+  return false;
+}
+
+// Nearest function start above "at": a "ret" followed by int3 padding. The
+// boundary is at most a few hundred bytes up, so the search is capped.
+uint8_t* FunctionStartAbove(uint8_t* at, uint8_t* lower) {
+  size_t span = static_cast<size_t>(at - lower);
+  if (span > 0x800) span = 0x800;
+  for (size_t i = 2; i < span; ++i) {
+    uint8_t* p = at - i;
+    if (*p != 0xC3 || p[1] != 0xCC) continue;
+    uint8_t* q = p + 1;
+    while (q < at && *q == 0xCC) ++q;
+    return q;
+  }
+  return nullptr;
+}
+
+bool TextSectionOf(uint8_t* base, size_t size, uint8_t** out, size_t* out_n) {
+  if (size < sizeof(IMAGE_DOS_HEADER)) return false;
+  const auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
+  if (dos->e_magic != IMAGE_DOS_SIGNATURE || dos->e_lfanew < 0) return false;
+  const size_t nt_at = static_cast<size_t>(dos->e_lfanew);
+  if (nt_at > size || size - nt_at < sizeof(IMAGE_NT_HEADERS64)) return false;
+  const auto* nt = reinterpret_cast<const IMAGE_NT_HEADERS64*>(base + nt_at);
+  if (nt->Signature != IMAGE_NT_SIGNATURE) return false;
+  const auto* sec = IMAGE_FIRST_SECTION(nt);
+  for (unsigned i = 0; i < nt->FileHeader.NumberOfSections; ++i) {
+    if (std::memcmp(sec[i].Name, ".text", 5) != 0) continue;
+    const size_t va = sec[i].VirtualAddress;
+    size_t n = sec[i].Misc.VirtualSize;
+    if (n == 0 || n > size - va) n = sec[i].SizeOfRawData;
+    if (va >= size || n > size - va) return false;
+    *out = base + va;
+    *out_n = n;
+    return true;
+  }
+  return false;
+}
+
+// Pacing for the rebuild. The first attempts are a second apart so a save that
+// lost its list is repaired on the frame it is loaded; from there the interval
+// backs off to 30 s but never stops.
+//
+// It must never stop: the active list is zero for reasons that have nothing to
+// do with a broken save. CAchievementsManager::Clear() zeroes it every time the
+// player returns to the main menu, and the catalogue can legitimately have
+// nothing left to hand out. A latch - "three failures and we are done, reset
+// when the list becomes non-empty again" - could therefore be burned in a state
+// a broken save never leaves, and a save loaded later in the same session was
+// then silently left unrepaired. Only a load can empty a list the player just
+// had, and that transition resets the pacing below.
+DWORD RebuildDelayMs(uint32_t tries) {
+  if (tries <= 3) return 1000;
+  if (tries <= 5) return 5000;
+  return 30000;
+}
+
+// Runs on the game's own thread, in place of the call to Update. Everything
+// here is guarded, so a swapped-out or half-initialised object is left alone.
+void HookAchievementsUpdate(void* manager, void* scope) {
+  static bool announced = false;
+  static uintptr_t watched = 0;     // manager instance currently being watched
+  static uint32_t last_active = 0;  // last non-zero list size seen; 0 = none yet
+  static uint32_t tries = 0;        // attempts since the pacing was reset
+  static DWORD next_try = 0;        // GetTickCount() of the next attempt
+
+  if (!announced) {
+    announced = true;
+    Log("achievements update hook: first tick, Update is being called");
+  }
+
+  // Nothing is read or written before the object passes the same "is this still
+  // the manager" test the monitor loop uses.
+  if (manager != nullptr && scope != nullptr && g_real_on_game_start != nullptr &&
+      LooksLikeManager(static_cast<const uint8_t*>(manager), g_hook_base, g_hook_size)) {
+    auto* m = static_cast<uint8_t*>(manager);
+    const DWORD now = GetTickCount();
+    if (watched != reinterpret_cast<uintptr_t>(manager)) {
+      watched = reinterpret_cast<uintptr_t>(manager);
+      last_active = 0;
+      tries = 0;
+      next_try = now;
+    }
+    const uint32_t active = *reinterpret_cast<const uint32_t*>(m + kActiveCount);
+    if (active > 0) {
+      if (last_active == 0) {
+        // A list exists again: this is a running game, so a later load of a
+        // save that carries none may need us and should not have to wait.
+        if (tries != 0) {
+          Log("active achievement list is non-empty again (%u entries); rebuild re-armed",
+              active);
+        }
+        tries = 0;
+        next_try = now;
+      }
+      last_active = active;
+    } else {
+      if (last_active != 0) {
+        // The list the player just had is gone: a save was loaded, or a load
+        // cleared it. Start over with the fast interval.
+        last_active = 0;
+        tries = 0;
+        next_try = now;
+      }
+      // While the backend is not ready (0x85) the game's own Update already
+      // retries OnGameStart(CEventScope&) every frame - the guarded call this
+      // hook sits in front of - so doing it here as well would only duplicate
+      // that work and burn attempts while there is nothing to rebuild from.
+      if (m[0x85] == 0 && static_cast<int32_t>(now - next_try) >= 0) {
+        g_real_on_game_start(manager, scope);
+        const uint32_t after = *reinterpret_cast<const uint32_t*>(m + kActiveCount);
+        if (after > 0) {
+          tries = 0;
+          Log("rebuilt the active achievement list this save carried none of: %u entries", after);
+        } else {
+          ++tries;
+          const DWORD delay = RebuildDelayMs(tries);
+          next_try = now + delay;
+          if (tries <= 3 || (tries % 10) == 0) {
+            Log("active achievement list is still empty after attempt %u "
+                "(no country in scope, or nothing left to unlock); next attempt in %lu ms",
+                tries, static_cast<unsigned long>(delay));
+          }
+        }
+      }
+    }
+  }
+  if (g_real_update != nullptr) g_real_update(manager, scope);
+}
+
+HookResult FindAndInstallHook(uint8_t* base, size_t size, bool write,
+                               uintptr_t access_instance) {
+  HookResult r;
+  r.hook_fn = reinterpret_cast<uintptr_t>(&HookAchievementsUpdate);
+  const uintptr_t image_base = reinterpret_cast<uintptr_t>(base);
+  uint8_t* text = nullptr;
+  size_t text_n = 0;
+  if (!TextSectionOf(base, size, &text, &text_n)) {
+    r.state = "not found (no .text section)";
+    return r;
+  }
+
+  int guard_hits = 0;
+  CallRef guard;
+  for (size_t i = 0; i + 5 <= text_n; ++i) {
+    if (text[i] != 0xE8) continue;
+    int32_t disp = 0;
+    std::memcpy(&disp, text + i + 1, sizeof(disp));
+    uint8_t* const at = text + i;
+    const uintptr_t target =
+        reinterpret_cast<uintptr_t>(at) + 5 + static_cast<intptr_t>(disp);
+    if (!InRange(target, image_base, size) || size - (target - image_base) < 0x48) continue;
+    if (!HasZeroedCounters(reinterpret_cast<const uint8_t*>(target), 0x48)) continue;
+    if (!GuardsOnGameStart(at, text)) continue;
+    guard.at = at;
+    guard.target = target;
+    ++guard_hits;
+  }
+  if (guard_hits != 1) {
+    char buf[96];
+    std::snprintf(buf, sizeof(buf), "not found (%d guarded OnGameStart calls)", guard_hits);
+    r.state = buf;
+    return r;
+  }
+
+  uint8_t* const update = FunctionStartAbove(guard.at, text);
+  if (update == nullptr) {
+    r.state = "not found (no function start above the guarded call)";
+    return r;
+  }
+  if (!LooksLikeFunctionEntry(update)) {
+    r.state = "not found (the boundary above the guarded call is not a prologue)";
+    return r;
+  }
+
+  int site_hits = 0;
+  int hooked_hits = 0;
+  CallRef site;
+  for (size_t i = 0; i + 5 <= text_n; ++i) {
+    if (text[i] != 0xE8) continue;
+    int32_t disp = 0;
+    std::memcpy(&disp, text + i + 1, sizeof(disp));
+    uint8_t* const at = text + i;
+    const uintptr_t target =
+        reinterpret_cast<uintptr_t>(at) + 5 + static_cast<intptr_t>(disp);
+    if (target == reinterpret_cast<uintptr_t>(update)) {
+      site.at = at;
+      site.target = target;
+      ++site_hits;
+    } else if (target == reinterpret_cast<uintptr_t>(&HookAchievementsUpdate) ||
+               (g_hook_stub != nullptr && target == reinterpret_cast<uintptr_t>(g_hook_stub))) {
+      site.at = at;
+      ++hooked_hits;
+    }
+  }
+
+  r.update = reinterpret_cast<uintptr_t>(update);
+  r.on_game_start = guard.target;
+  r.call_site = reinterpret_cast<uintptr_t>(site.at);
+
+  if (site_hits == 0 && hooked_hits == 1) {
+    r.state = "already hooked";
+    return r;
+  }
+  if (site_hits != 1) {
+    char buf[96];
+    std::snprintf(buf, sizeof(buf), "call site not unique (%d)", site_hits);
+    r.state = buf;
+    return r;
+  }
+  // This must be the achievements pump, not merely a call to Update: the game
+  // reaches it with a fresh manager from AccessInstance() a few bytes earlier -
+  // 15 bytes before the call in every build from 4.2.4 to 4.5.4. Without that
+  // evidence nothing is retargeted. Pointing a call in an unrelated function at
+  // our stub is the one failure this code cannot undo, so refuse instead.
+  bool anchored = false;
+  if (access_instance != 0) {
+    const size_t site_off = static_cast<size_t>(site.at - text);
+    const size_t from = site_off > 64 ? site_off - 64 : 0;
+    for (size_t i = from; i + 5 <= site_off; ++i) {
+      if (text[i] != 0xE8) continue;
+      int32_t disp = 0;
+      std::memcpy(&disp, text + i + 1, sizeof(disp));
+      const uintptr_t target =
+          reinterpret_cast<uintptr_t>(text + i) + 5 + static_cast<intptr_t>(disp);
+      if (target == access_instance) {
+        anchored = true;
+        break;
+      }
+    }
+  }
+  if (!anchored) {
+    r.state = access_instance == 0
+                  ? "not found (achievements manager unresolved, call site unverified)"
+                  : "not found (no AccessInstance call beside the update call site)";
+    return r;
+  }
+
+  if (!write) {
+    r.state = "would hook";
+    return r;
+  }
+
+  uint8_t* const stub = AllocNear(reinterpret_cast<uintptr_t>(site.at), 16);
+  if (stub == nullptr) {
+    r.state = "no executable stub within rel32 range";
+    return r;
+  }
+  stub[0] = 0x48;  // mov rax, imm64
+  stub[1] = 0xB8;
+  const uint64_t hook_addr = reinterpret_cast<uint64_t>(&HookAchievementsUpdate);
+  std::memcpy(stub + 2, &hook_addr, sizeof(hook_addr));
+  stub[10] = 0xFF;  // jmp rax
+  stub[11] = 0xE0;
+  FlushInstructionCache(GetCurrentProcess(), stub, 12);
+  DWORD stub_old = 0;
+  VirtualProtect(stub, 16, PAGE_EXECUTE_READ, &stub_old);
+
+  // The real functions and the stub must all be in place before the retarget
+  // lands, or a thread arriving in the hook first would skip an update.
+  g_real_update = reinterpret_cast<UpdateFn>(update);
+  g_real_on_game_start = reinterpret_cast<UpdateFn>(guard.target);
+  g_hook_base = image_base;
+  g_hook_size = size;
+  g_hook_stub = stub;
+  r.stub = reinterpret_cast<uintptr_t>(stub);
+
+  const intptr_t delta = reinterpret_cast<intptr_t>(stub) -
+                         (reinterpret_cast<intptr_t>(site.at) + 5);
+  if (delta != static_cast<int32_t>(delta)) {
+    r.state = "stub out of rel32 range";
+    return r;
+  }
+  const int32_t rel = static_cast<int32_t>(delta);
+  if (!WriteBytes(site.at + 1, &rel, sizeof(rel))) {
+    r.state = "write failed";
+    return r;
+  }
+  r.state = "hooked";
+  return r;
 }
 
 }  // namespace
@@ -424,32 +879,50 @@ ApplyResult ApplyAll(uint8_t* base, size_t size, bool write, bool include_cosmet
 
   const uintptr_t image_base = reinterpret_cast<uintptr_t>(base);
 
-  // Resolve CAchievementsManager::AccessInstance() from the call site inside
-  // the checksum patch, falling back to the one next to the console store.
-  if (match_a != 0) {
-    const uintptr_t t = CallTarget(reinterpret_cast<uint8_t*>(match_a + 8), image_base, size);
-    if (InRange(t, image_base, size)) r.access_instance = t;
-  }
-  if (r.access_instance == 0 && match_b2 != 0) {
-    const uintptr_t t = CallTarget(reinterpret_cast<uint8_t*>(match_b2 - 5), image_base, size);
-    if (InRange(t, image_base, size)) r.access_instance = t;
+  // Independent derivation of the manager singleton's static slot: the load the
+  // signature pins. It is not the function's entry - a frame allocation sits in
+  // front of it on every build verified so far - which is what
+  // LooksLikeAccessInstance has to account for.
+  uintptr_t mov_sig = 0;
+  {
+    const std::vector<uint8_t*> hits = ScanAll(base, size, kMgrSlotSig);
+    if (hits.size() == 1) mov_sig = reinterpret_cast<uintptr_t>(hits[0]);
   }
 
-  // The static slot holding the manager instance is loaded at the top of
+  // Resolve CAchievementsManager::AccessInstance() from the call that sits next
+  // to a patch point. Both derivations are shape-checked (see
+  // CallToAccessInstance): the checksum point's fallback spelling moves its call
+  // away from "+8", and reading a fixed offset there is exactly how a wrong
+  // address would be adopted - which costs the old-save hook its anchor and
+  // silently disables the very fix this file is about.
+  uintptr_t access = 0;
+  bool access_from_call = false;
+  if (match_a != 0) {
+    access = CallToAccessInstance(reinterpret_cast<uint8_t*>(match_a), image_base, size, 0x20,
+                                  true);
+    access_from_call = access != 0;
+  }
+  if (access == 0 && match_b2 != 0) {
+    access = CallToAccessInstance(reinterpret_cast<uint8_t*>(match_b2), image_base, size, 0x14,
+                                  false);
+    access_from_call = access != 0;
+  }
+  // No third derivation on purpose. The signature hit is the load *inside*
+  // AccessInstance(), not its entry (see LooksLikeAccessInstance), and handing
+  // that address to the hook would put it four bytes past the function it is
+  // supposed to anchor on. Refusing leaves the old-save hook off on such a
+  // build, which is the outcome this file prefers everywhere else.
+  r.access_instance = access;
+
+  // The static slot holding the manager instance is loaded near the top of
   // AccessInstance(). Two independent derivations exist - the call site and
   // the wildcard signature - and the slot is only trusted when they agree,
   // or when the single candidate matches the signature's shape exactly.
   // Forcing flags in an unrelated object every 200 ms is the one failure this
   // code cannot recover from, so refusing is the safe direction.
   uintptr_t mov_call = 0;
-  if (r.access_instance != 0 &&
-      size - (r.access_instance - image_base) >= 0x20) {
-    mov_call = FindMovRaxRip(reinterpret_cast<uint8_t*>(r.access_instance), 0x20);
-  }
-  uintptr_t mov_sig = 0;
-  {
-    const std::vector<uint8_t*> hits = ScanAll(base, size, kMgrSlotSig);
-    if (hits.size() == 1) mov_sig = reinterpret_cast<uintptr_t>(hits[0]);
+  if (access_from_call && access != 0 && size - (access - image_base) >= 0x20) {
+    mov_call = FindMovRaxRip(reinterpret_cast<uint8_t*>(access), 0x20);
   }
 
   uintptr_t mov = 0;
@@ -488,6 +961,10 @@ ApplyResult ApplyAll(uint8_t* base, size_t size, bool write, bool include_cosmet
       r.slot_source = "slot address outside the image";
     }
   }
+
+  // Old-save repair: retarget the single call that drives the achievements
+  // update, so a save that lost its active list can have it rebuilt.
+  r.hook = FindAndInstallHook(base, size, write, r.access_instance);
   return r;
 }
 

@@ -23,8 +23,21 @@ struct SiteResult {
   uintptr_t patch_address = 0;
 };
 
+// The old-save repair (r9): one call site in the game's frame update is
+// retargeted so that a save which carried no active achievement list gets that
+// list rebuilt from the achievement catalogue (see unlocker.cpp).
+struct HookResult {
+  std::string state;      // "hooked" / "would hook" / "already hooked" / a reason
+  uintptr_t update = 0;   // CAchievementsManager::Update(CAchievementsManager*, CEventScope*)
+  uintptr_t on_game_start = 0;  // CAchievementsManager::OnGameStart(CAchievementsManager*, CEventScope*)
+  uintptr_t call_site = 0;      // the call instruction that is retargeted
+  uintptr_t hook_fn = 0;        // our own thunk, for the offline stub check
+  uintptr_t stub = 0;           // the "mov rax, hook; jmp rax" page, once installed
+};
+
 struct ApplyResult {
   std::vector<SiteResult> sites;
+  HookResult hook;
   uintptr_t access_instance = 0;  // CAchievementsManager::AccessInstance()
   uintptr_t mgr_slot = 0;         // static pointer holding the manager instance
   std::string slot_source;        // which derivation produced mgr_slot, and

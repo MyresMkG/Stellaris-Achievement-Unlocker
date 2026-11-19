@@ -17,7 +17,7 @@ HMODULE g_self = nullptr;
 
 // Identifies the build in the first log line, so a log file can be traced
 // back to the DLL that produced it.
-constexpr char kBuild[] = "r7 2026-10-03";
+constexpr char kBuild[] = "r9.2 2026-11-19";
 
 // Both switches below are files the user drops next to the DLL, so they can be
 // flipped without rebuilding anything. An unreadable own-path turns both of
@@ -72,6 +72,16 @@ DWORD WINAPI Worker(void*) {
   }
   for (const std::string& note : r.notes) {
     unlocker::Log("note: %s", note.c_str());
+  }
+
+  if (r.hook.update != 0) {
+    unlocker::Log("old-save repair hook: %s (Update rva 0x%zX, OnGameStart rva 0x%zX, call site rva 0x%zX)",
+                  r.hook.state.c_str(),
+                  static_cast<size_t>(r.hook.update - base),
+                  static_cast<size_t>(r.hook.on_game_start - base),
+                  static_cast<size_t>(r.hook.call_site - base));
+  } else {
+    unlocker::Log("old-save repair hook: %s", r.hook.state.c_str());
   }
 
   if (r.mgr_slot != 0) {

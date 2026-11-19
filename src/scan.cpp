@@ -71,47 +71,70 @@ std::vector<uint8_t*> ScanAll(uint8_t* base, size_t size, const std::string& tex
   return ScanAll(base, size, ParseSig(text));
 }
 
-// Writes n bytes at dst, temporarily lifting page protection. Writes of up
-// to 8 bytes go out as one store whenever the address allows it, so a thread
-// running through this code can never fetch a half-written instruction.
+namespace {
+
+// One naturally aligned 8-byte read-modify-write store. It carries the n patch
+// bytes that belong at dst (which must lie inside the block) and leaves every
+// other byte of the block alone. A single aligned store of this width is atomic,
+// so a thread fetching this code can never observe half of it.
+bool StoreBlock(uintptr_t block, uintptr_t dst, const uint8_t* src, size_t n) {
+  DWORD old = 0;
+  if (!VirtualProtect(reinterpret_cast<void*>(block), sizeof(uint64_t),
+                      PAGE_EXECUTE_READWRITE, &old)) {
+    return false;
+  }
+  uint64_t merged = 0;
+  std::memcpy(&merged, reinterpret_cast<const void*>(block), sizeof(merged));
+  std::memcpy(reinterpret_cast<uint8_t*>(&merged) + (dst - block), src, n);
+  *reinterpret_cast<volatile uint64_t*>(block) = merged;
+  VirtualProtect(reinterpret_cast<void*>(block), sizeof(uint64_t), old, &old);
+  FlushInstructionCache(GetCurrentProcess(), reinterpret_cast<void*>(dst), n);
+  return true;
+}
+
+}  // namespace
+
+// Writes n bytes at dst, temporarily lifting page protection. A patch that fits
+// in one naturally aligned 8-byte block goes out as a single store, which is
+// atomic by definition; one that straddles two blocks but stays inside a cache
+// line goes out as one store too (a store confined to a cache line is never torn
+// on any hardware this runs on).
+//
+// A patch that crosses a cache line cannot be written atomically at all, so it
+// is split at the 8-byte boundaries and written from its end downwards: every
+// store is still atomic, the first byte of the patched instruction lands last,
+// and the only thing another thread can catch is the seam between two blocks. No
+// patch point in kSpecs needs that path - the widest one is two bytes, which
+// always fits a block - and a point that did would want a shorter encoding
+// rather than a cleverer writer.
 bool WriteBytes(void* dst, const void* src, size_t n) {
   if (n == 0) return true;
 
-  // Two candidate windows, both 8 bytes wide: the naturally aligned block
-  // holding the patch (a single aligned store is atomic by definition), or,
-  // when the patch straddles two blocks, the window ending at the patch as
-  // long as it stays inside one cache line (a store confined to a cache line
-  // is never torn on any hardware this runs on).
-  uintptr_t window = 0;
+  const uintptr_t at = reinterpret_cast<uintptr_t>(dst);
+  const uint8_t* const bytes = static_cast<const uint8_t*>(src);
+
   if (n <= sizeof(uint64_t)) {
-    const uintptr_t at = reinterpret_cast<uintptr_t>(dst);
     const uintptr_t first = at & ~static_cast<uintptr_t>(7);
     const uintptr_t last = (at + n + 7) & ~static_cast<uintptr_t>(7);
-    if (last - first == sizeof(uint64_t)) {
-      window = first;
-    } else if (at + n >= sizeof(uint64_t)) {
+    if (last - first == sizeof(uint64_t)) return StoreBlock(first, at, bytes, n);
+    if (at + n >= sizeof(uint64_t)) {
       const uintptr_t loose = at + n - sizeof(uint64_t);
-      if ((loose >> 6) == ((loose + 7) >> 6)) window = loose;
+      if ((loose >> 6) == ((loose + 7) >> 6)) return StoreBlock(loose, at, bytes, n);
     }
   }
 
-  void* const area = window != 0 ? reinterpret_cast<void*>(window) : dst;
-  const size_t area_n = window != 0 ? sizeof(uint64_t) : n;
-
-  DWORD old = 0;
-  if (!VirtualProtect(area, area_n, PAGE_EXECUTE_READWRITE, &old)) return false;
-  if (window != 0) {
-    uint64_t merged = 0;
-    std::memcpy(&merged, reinterpret_cast<const void*>(window), sizeof(merged));
-    std::memcpy(reinterpret_cast<uint8_t*>(&merged) +
-                    (reinterpret_cast<uintptr_t>(dst) - window),
-                src, n);
-    *reinterpret_cast<volatile uint64_t*>(window) = merged;
-  } else {
-    std::memcpy(dst, src, n);
+  for (uintptr_t end = at + n; end > at;) {
+    uintptr_t block = (end - 1) & ~static_cast<uintptr_t>(7);
+    uintptr_t from = block > at ? block : at;
+    if (end - from > sizeof(uint64_t)) {
+      from = end - sizeof(uint64_t);
+      block = from & ~static_cast<uintptr_t>(7);
+    }
+    if (!StoreBlock(block, from, bytes + (from - at), static_cast<size_t>(end - from))) {
+      return false;
+    }
+    end = from;
   }
-  VirtualProtect(area, area_n, old, &old);
-  FlushInstructionCache(GetCurrentProcess(), dst, n);
   return true;
 }
 

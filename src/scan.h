@@ -23,9 +23,10 @@ std::vector<SigByte> ParseSig(const std::string& text);
 std::vector<uint8_t*> ScanAll(uint8_t* base, size_t size, const std::vector<SigByte>& sig);
 std::vector<uint8_t*> ScanAll(uint8_t* base, size_t size, const std::string& text);
 
-// Writes n bytes at dst, temporarily lifting page protection. Writes of up
-// to 8 bytes go out as a single store where the address allows it, so no
-// other thread can ever observe half of the patch.
+// Writes n bytes at dst, temporarily lifting page protection. A patch that fits
+// one 8-byte block - or one cache line - goes out as a single store, so no other
+// thread can observe half of it. A wider one is split into atomic per-block
+// stores written end-first; see the comment on the implementation.
 bool WriteBytes(void* dst, const void* src, size_t n);
 
 // Base and image size of this process' own main module (stellaris.exe).

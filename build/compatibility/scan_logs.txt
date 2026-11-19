@@ -1,0 +1,1341 @@
+﻿Offline checks only; no game launch or backend achievement verification.
+
+file: D:\zStudy\stellaris\stellaris_versions\stellaris_4.2.4.exe
+image size 0x398E000
+
+pass 1: dry run (nothing written)
+  mods / file checksum         would patch            patch byte rva 0x1A4184
+  console use -> save flag     would patch            patch byte rva 0x8C422A
+  console use -> manager flag  would patch            patch byte rva 0x8C4236
+  save load -> manager flag    would patch            patch byte rva 0x22FCB7
+  ironman console (idle)       would patch            patch byte rva 0x32440E
+  ironman console (restore)    would patch            patch byte rva 0x325B50
+  checksum warning (UI)        would patch            patch byte rva 0xE04002
+  checksum warning (tooltip)   would patch            patch byte rva 0xE04AC6
+  AccessInstance               rva 0x57A940
+  manager slot                 rva 0x340A8C8 (call site + signature agree)
+  old-save repair hook         would hook             Update 0x57A9E0, OnGameStart 0x57AF80, call 0x2482F2
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: console use -> save flag: primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: checksum warning (UI): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 2: applied
+  mods / file checksum         patched                patch byte rva 0x1A4184
+  console use -> save flag     patched                patch byte rva 0x8C422A
+  console use -> manager flag  patched                patch byte rva 0x8C4236
+  save load -> manager flag    patched                patch byte rva 0x22FCB7
+  ironman console (idle)       patched                patch byte rva 0x32440E
+  ironman console (restore)    patched                patch byte rva 0x325B50
+  checksum warning (UI)        patched                patch byte rva 0xE04002
+  checksum warning (tooltip)   patched                patch byte rva 0xE04AC6
+  AccessInstance               rva 0x57A940
+  manager slot                 rva 0x340A8C8 (call site + signature agree)
+  old-save repair hook         hooked                 Update 0x57A9E0, OnGameStart 0x57AF80, call 0x2482F2, stub allocated next to the call site
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: console use -> save flag: primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: checksum warning (UI): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 3: re-scan (idempotency)
+  mods / file checksum         already patched        patch byte rva 0x1A4184
+  console use -> save flag     already patched        patch byte rva 0x8C422A
+  console use -> manager flag  already patched        patch byte rva 0x8C4236
+  save load -> manager flag    already patched        patch byte rva 0x22FCB7
+  ironman console (idle)       already patched        patch byte rva 0x32440E
+  ironman console (restore)    already patched        patch byte rva 0x325B50
+  checksum warning (UI)        already patched        patch byte rva 0xE04002
+  checksum warning (tooltip)   already patched        patch byte rva 0xE04AC6
+  AccessInstance               rva 0x57A940
+  manager slot                 rva 0x340A8C8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x57A9E0, OnGameStart 0x57AF80, call 0x2482F2
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: console use -> save flag: primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: checksum warning (UI): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 4: cosmetic patch off
+  mods / file checksum         already patched        patch byte rva 0x1A4184
+  console use -> save flag     already patched        patch byte rva 0x8C422A
+  console use -> manager flag  already patched        patch byte rva 0x8C4236
+  save load -> manager flag    already patched        patch byte rva 0x22FCB7
+  ironman console (idle)       already patched        patch byte rva 0x32440E
+  ironman console (restore)    already patched        patch byte rva 0x325B50
+  checksum warning (UI)        skipped (cosmetic off)
+  checksum warning (tooltip)   skipped (cosmetic off)
+  AccessInstance               rva 0x57A940
+  manager slot                 rva 0x340A8C8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x57A9E0, OnGameStart 0x57AF80, call 0x2482F2
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: console use -> save flag: primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check A: checksum compare register (8B F0 -> 8B F8)
+  mods / file checksum         already patched        patch byte rva 0x1A4184
+  console use -> save flag     already patched        patch byte rva 0x8C422A
+  console use -> manager flag  already patched        patch byte rva 0x8C4236
+  save load -> manager flag    already patched        patch byte rva 0x22FCB7
+  ironman console (idle)       already patched        patch byte rva 0x32440E
+  ironman console (restore)    already patched        patch byte rva 0x325B50
+  checksum warning (UI)        already patched        patch byte rva 0xE04002
+  checksum warning (tooltip)   already patched        patch byte rva 0xE04AC6
+  AccessInstance               rva 0x57A940
+  manager slot                 rva 0x340A8C8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x57A9E0, OnGameStart 0x57AF80, call 0x2482F2
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: console use -> save flag: primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: checksum warning (UI): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check B: checksum compare call spelling (E8 -> E9)
+  mods / file checksum         already patched        patch byte rva 0x1A4184
+  console use -> save flag     already patched        patch byte rva 0x8C422A
+  console use -> manager flag  already patched        patch byte rva 0x8C4236
+  save load -> manager flag    already patched        patch byte rva 0x22FCB7
+  ironman console (idle)       already patched        patch byte rva 0x32440E
+  ironman console (restore)    already patched        patch byte rva 0x325B50
+  checksum warning (UI)        already patched        patch byte rva 0xE04002
+  checksum warning (tooltip)   already patched        patch byte rva 0xE04AC6
+  AccessInstance               rva 0x57A940
+  manager slot                 rva 0x340A8C8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x57A9E0, OnGameStart 0x57AF80, call 0x2482F2
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: console use -> save flag: primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: checksum warning (UI): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check C: ironman idle, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1A4184
+  console use -> save flag     already patched        patch byte rva 0x8C422A
+  console use -> manager flag  already patched        patch byte rva 0x8C4236
+  save load -> manager flag    already patched        patch byte rva 0x22FCB7
+  ironman console (idle)       already patched        patch byte rva 0x32440E
+  ironman console (restore)    already patched        patch byte rva 0x325B50
+  checksum warning (UI)        already patched        patch byte rva 0xE04002
+  checksum warning (tooltip)   already patched        patch byte rva 0xE04AC6
+  AccessInstance               rva 0x57A940
+  manager slot                 rva 0x340A8C8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x57A9E0, OnGameStart 0x57AF80, call 0x2482F2
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: console use -> save flag: primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: checksum warning (UI): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check D: ironman restore, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1A4184
+  console use -> save flag     already patched        patch byte rva 0x8C422A
+  console use -> manager flag  already patched        patch byte rva 0x8C4236
+  save load -> manager flag    already patched        patch byte rva 0x22FCB7
+  ironman console (idle)       already patched        patch byte rva 0x32440E
+  ironman console (restore)    already patched        patch byte rva 0x325B50
+  checksum warning (UI)        already patched        patch byte rva 0xE04002
+  checksum warning (tooltip)   already patched        patch byte rva 0xE04AC6
+  AccessInstance               rva 0x57A940
+  manager slot                 rva 0x340A8C8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x57A9E0, OnGameStart 0x57AF80, call 0x2482F2
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: console use -> save flag: primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: checksum warning (UI): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+OK
+
+file: D:\zStudy\stellaris\stellaris_versions\stellaris_4.4.1.exe
+image size 0x391A000
+
+pass 1: dry run (nothing written)
+  mods / file checksum         would patch            patch byte rva 0x1BE39E
+  console use -> save flag     would patch            patch byte rva 0x97624D
+  console use -> manager flag  would patch            patch byte rva 0x976259
+  save load -> manager flag    would patch            patch byte rva 0x24ECF7
+  ironman console (idle)       would patch            patch byte rva 0x334ABE
+  ironman console (restore)    would patch            patch byte rva 0x33616D
+  checksum warning (UI)        would patch            patch byte rva 0xF111AC
+  checksum warning (tooltip)   would patch            patch byte rva 0xF11ACD
+  AccessInstance               rva 0x5DA240
+  manager slot                 rva 0x336B0E8 (call site + signature agree)
+  old-save repair hook         would hook             Update 0x5DA2E0, OnGameStart 0x5DA540, call 0x263C00
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 2: applied
+  mods / file checksum         patched                patch byte rva 0x1BE39E
+  console use -> save flag     patched                patch byte rva 0x97624D
+  console use -> manager flag  patched                patch byte rva 0x976259
+  save load -> manager flag    patched                patch byte rva 0x24ECF7
+  ironman console (idle)       patched                patch byte rva 0x334ABE
+  ironman console (restore)    patched                patch byte rva 0x33616D
+  checksum warning (UI)        patched                patch byte rva 0xF111AC
+  checksum warning (tooltip)   patched                patch byte rva 0xF11ACD
+  AccessInstance               rva 0x5DA240
+  manager slot                 rva 0x336B0E8 (call site + signature agree)
+  old-save repair hook         hooked                 Update 0x5DA2E0, OnGameStart 0x5DA540, call 0x263C00, stub allocated next to the call site
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 3: re-scan (idempotency)
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97624D
+  console use -> manager flag  already patched        patch byte rva 0x976259
+  save load -> manager flag    already patched        patch byte rva 0x24ECF7
+  ironman console (idle)       already patched        patch byte rva 0x334ABE
+  ironman console (restore)    already patched        patch byte rva 0x33616D
+  checksum warning (UI)        already patched        patch byte rva 0xF111AC
+  checksum warning (tooltip)   already patched        patch byte rva 0xF11ACD
+  AccessInstance               rva 0x5DA240
+  manager slot                 rva 0x336B0E8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA2E0, OnGameStart 0x5DA540, call 0x263C00
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 4: cosmetic patch off
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97624D
+  console use -> manager flag  already patched        patch byte rva 0x976259
+  save load -> manager flag    already patched        patch byte rva 0x24ECF7
+  ironman console (idle)       already patched        patch byte rva 0x334ABE
+  ironman console (restore)    already patched        patch byte rva 0x33616D
+  checksum warning (UI)        skipped (cosmetic off)
+  checksum warning (tooltip)   skipped (cosmetic off)
+  AccessInstance               rva 0x5DA240
+  manager slot                 rva 0x336B0E8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA2E0, OnGameStart 0x5DA540, call 0x263C00
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check A: checksum compare register (8B F0 -> 8B F8)
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97624D
+  console use -> manager flag  already patched        patch byte rva 0x976259
+  save load -> manager flag    already patched        patch byte rva 0x24ECF7
+  ironman console (idle)       already patched        patch byte rva 0x334ABE
+  ironman console (restore)    already patched        patch byte rva 0x33616D
+  checksum warning (UI)        already patched        patch byte rva 0xF111AC
+  checksum warning (tooltip)   already patched        patch byte rva 0xF11ACD
+  AccessInstance               rva 0x5DA240
+  manager slot                 rva 0x336B0E8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA2E0, OnGameStart 0x5DA540, call 0x263C00
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check B: checksum compare call spelling (E8 -> E9)
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97624D
+  console use -> manager flag  already patched        patch byte rva 0x976259
+  save load -> manager flag    already patched        patch byte rva 0x24ECF7
+  ironman console (idle)       already patched        patch byte rva 0x334ABE
+  ironman console (restore)    already patched        patch byte rva 0x33616D
+  checksum warning (UI)        already patched        patch byte rva 0xF111AC
+  checksum warning (tooltip)   already patched        patch byte rva 0xF11ACD
+  AccessInstance               rva 0x5DA240
+  manager slot                 rva 0x336B0E8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA2E0, OnGameStart 0x5DA540, call 0x263C00
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check C: ironman idle, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97624D
+  console use -> manager flag  already patched        patch byte rva 0x976259
+  save load -> manager flag    already patched        patch byte rva 0x24ECF7
+  ironman console (idle)       already patched        patch byte rva 0x334ABE
+  ironman console (restore)    already patched        patch byte rva 0x33616D
+  checksum warning (UI)        already patched        patch byte rva 0xF111AC
+  checksum warning (tooltip)   already patched        patch byte rva 0xF11ACD
+  AccessInstance               rva 0x5DA240
+  manager slot                 rva 0x336B0E8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA2E0, OnGameStart 0x5DA540, call 0x263C00
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check D: ironman restore, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97624D
+  console use -> manager flag  already patched        patch byte rva 0x976259
+  save load -> manager flag    already patched        patch byte rva 0x24ECF7
+  ironman console (idle)       already patched        patch byte rva 0x334ABE
+  ironman console (restore)    already patched        patch byte rva 0x33616D
+  checksum warning (UI)        already patched        patch byte rva 0xF111AC
+  checksum warning (tooltip)   already patched        patch byte rva 0xF11ACD
+  AccessInstance               rva 0x5DA240
+  manager slot                 rva 0x336B0E8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA2E0, OnGameStart 0x5DA540, call 0x263C00
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+OK
+
+file: D:\zStudy\stellaris\stellaris_versions\stellaris_4.4.2.exe
+image size 0x391A000
+
+pass 1: dry run (nothing written)
+  mods / file checksum         would patch            patch byte rva 0x1BE39E
+  console use -> save flag     would patch            patch byte rva 0x97622D
+  console use -> manager flag  would patch            patch byte rva 0x976239
+  save load -> manager flag    would patch            patch byte rva 0x24ECE7
+  ironman console (idle)       would patch            patch byte rva 0x334AAE
+  ironman console (restore)    would patch            patch byte rva 0x33615D
+  checksum warning (UI)        would patch            patch byte rva 0xF1100C
+  checksum warning (tooltip)   would patch            patch byte rva 0xF1192D
+  AccessInstance               rva 0x5DA180
+  manager slot                 rva 0x336B0F8 (call site + signature agree)
+  old-save repair hook         would hook             Update 0x5DA220, OnGameStart 0x5DA480, call 0x263BF0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 2: applied
+  mods / file checksum         patched                patch byte rva 0x1BE39E
+  console use -> save flag     patched                patch byte rva 0x97622D
+  console use -> manager flag  patched                patch byte rva 0x976239
+  save load -> manager flag    patched                patch byte rva 0x24ECE7
+  ironman console (idle)       patched                patch byte rva 0x334AAE
+  ironman console (restore)    patched                patch byte rva 0x33615D
+  checksum warning (UI)        patched                patch byte rva 0xF1100C
+  checksum warning (tooltip)   patched                patch byte rva 0xF1192D
+  AccessInstance               rva 0x5DA180
+  manager slot                 rva 0x336B0F8 (call site + signature agree)
+  old-save repair hook         hooked                 Update 0x5DA220, OnGameStart 0x5DA480, call 0x263BF0, stub allocated next to the call site
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 3: re-scan (idempotency)
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97622D
+  console use -> manager flag  already patched        patch byte rva 0x976239
+  save load -> manager flag    already patched        patch byte rva 0x24ECE7
+  ironman console (idle)       already patched        patch byte rva 0x334AAE
+  ironman console (restore)    already patched        patch byte rva 0x33615D
+  checksum warning (UI)        already patched        patch byte rva 0xF1100C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF1192D
+  AccessInstance               rva 0x5DA180
+  manager slot                 rva 0x336B0F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA220, OnGameStart 0x5DA480, call 0x263BF0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 4: cosmetic patch off
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97622D
+  console use -> manager flag  already patched        patch byte rva 0x976239
+  save load -> manager flag    already patched        patch byte rva 0x24ECE7
+  ironman console (idle)       already patched        patch byte rva 0x334AAE
+  ironman console (restore)    already patched        patch byte rva 0x33615D
+  checksum warning (UI)        skipped (cosmetic off)
+  checksum warning (tooltip)   skipped (cosmetic off)
+  AccessInstance               rva 0x5DA180
+  manager slot                 rva 0x336B0F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA220, OnGameStart 0x5DA480, call 0x263BF0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check A: checksum compare register (8B F0 -> 8B F8)
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97622D
+  console use -> manager flag  already patched        patch byte rva 0x976239
+  save load -> manager flag    already patched        patch byte rva 0x24ECE7
+  ironman console (idle)       already patched        patch byte rva 0x334AAE
+  ironman console (restore)    already patched        patch byte rva 0x33615D
+  checksum warning (UI)        already patched        patch byte rva 0xF1100C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF1192D
+  AccessInstance               rva 0x5DA180
+  manager slot                 rva 0x336B0F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA220, OnGameStart 0x5DA480, call 0x263BF0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check B: checksum compare call spelling (E8 -> E9)
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97622D
+  console use -> manager flag  already patched        patch byte rva 0x976239
+  save load -> manager flag    already patched        patch byte rva 0x24ECE7
+  ironman console (idle)       already patched        patch byte rva 0x334AAE
+  ironman console (restore)    already patched        patch byte rva 0x33615D
+  checksum warning (UI)        already patched        patch byte rva 0xF1100C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF1192D
+  AccessInstance               rva 0x5DA180
+  manager slot                 rva 0x336B0F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA220, OnGameStart 0x5DA480, call 0x263BF0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check C: ironman idle, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97622D
+  console use -> manager flag  already patched        patch byte rva 0x976239
+  save load -> manager flag    already patched        patch byte rva 0x24ECE7
+  ironman console (idle)       already patched        patch byte rva 0x334AAE
+  ironman console (restore)    already patched        patch byte rva 0x33615D
+  checksum warning (UI)        already patched        patch byte rva 0xF1100C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF1192D
+  AccessInstance               rva 0x5DA180
+  manager slot                 rva 0x336B0F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA220, OnGameStart 0x5DA480, call 0x263BF0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check D: ironman restore, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1BE39E
+  console use -> save flag     already patched        patch byte rva 0x97622D
+  console use -> manager flag  already patched        patch byte rva 0x976239
+  save load -> manager flag    already patched        patch byte rva 0x24ECE7
+  ironman console (idle)       already patched        patch byte rva 0x334AAE
+  ironman console (restore)    already patched        patch byte rva 0x33615D
+  checksum warning (UI)        already patched        patch byte rva 0xF1100C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF1192D
+  AccessInstance               rva 0x5DA180
+  manager slot                 rva 0x336B0F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DA220, OnGameStart 0x5DA480, call 0x263BF0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+OK
+
+file: D:\zStudy\stellaris\stellaris_versions\stellaris_4.4.4.exe
+image size 0x3927000
+
+pass 1: dry run (nothing written)
+  mods / file checksum         would patch            patch byte rva 0x1BEBDE
+  console use -> save flag     would patch            patch byte rva 0x9791FD
+  console use -> manager flag  would patch            patch byte rva 0x979209
+  save load -> manager flag    would patch            patch byte rva 0x24FDF7
+  ironman console (idle)       would patch            patch byte rva 0x335CEE
+  ironman console (restore)    would patch            patch byte rva 0x33739D
+  checksum warning (UI)        would patch            patch byte rva 0xF1751C
+  checksum warning (tooltip)   would patch            patch byte rva 0xF17E3D
+  AccessInstance               rva 0x5DC0D0
+  manager slot                 rva 0x33775F8 (call site + signature agree)
+  old-save repair hook         would hook             Update 0x5DC170, OnGameStart 0x5DC3D0, call 0x264EA0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 2: applied
+  mods / file checksum         patched                patch byte rva 0x1BEBDE
+  console use -> save flag     patched                patch byte rva 0x9791FD
+  console use -> manager flag  patched                patch byte rva 0x979209
+  save load -> manager flag    patched                patch byte rva 0x24FDF7
+  ironman console (idle)       patched                patch byte rva 0x335CEE
+  ironman console (restore)    patched                patch byte rva 0x33739D
+  checksum warning (UI)        patched                patch byte rva 0xF1751C
+  checksum warning (tooltip)   patched                patch byte rva 0xF17E3D
+  AccessInstance               rva 0x5DC0D0
+  manager slot                 rva 0x33775F8 (call site + signature agree)
+  old-save repair hook         hooked                 Update 0x5DC170, OnGameStart 0x5DC3D0, call 0x264EA0, stub allocated next to the call site
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 3: re-scan (idempotency)
+  mods / file checksum         already patched        patch byte rva 0x1BEBDE
+  console use -> save flag     already patched        patch byte rva 0x9791FD
+  console use -> manager flag  already patched        patch byte rva 0x979209
+  save load -> manager flag    already patched        patch byte rva 0x24FDF7
+  ironman console (idle)       already patched        patch byte rva 0x335CEE
+  ironman console (restore)    already patched        patch byte rva 0x33739D
+  checksum warning (UI)        already patched        patch byte rva 0xF1751C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF17E3D
+  AccessInstance               rva 0x5DC0D0
+  manager slot                 rva 0x33775F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DC170, OnGameStart 0x5DC3D0, call 0x264EA0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+pass 4: cosmetic patch off
+  mods / file checksum         already patched        patch byte rva 0x1BEBDE
+  console use -> save flag     already patched        patch byte rva 0x9791FD
+  console use -> manager flag  already patched        patch byte rva 0x979209
+  save load -> manager flag    already patched        patch byte rva 0x24FDF7
+  ironman console (idle)       already patched        patch byte rva 0x335CEE
+  ironman console (restore)    already patched        patch byte rva 0x33739D
+  checksum warning (UI)        skipped (cosmetic off)
+  checksum warning (tooltip)   skipped (cosmetic off)
+  AccessInstance               rva 0x5DC0D0
+  manager slot                 rva 0x33775F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DC170, OnGameStart 0x5DC3D0, call 0x264EA0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check A: checksum compare register (8B F0 -> 8B F8)
+  mods / file checksum         already patched        patch byte rva 0x1BEBDE
+  console use -> save flag     already patched        patch byte rva 0x9791FD
+  console use -> manager flag  already patched        patch byte rva 0x979209
+  save load -> manager flag    already patched        patch byte rva 0x24FDF7
+  ironman console (idle)       already patched        patch byte rva 0x335CEE
+  ironman console (restore)    already patched        patch byte rva 0x33739D
+  checksum warning (UI)        already patched        patch byte rva 0xF1751C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF17E3D
+  AccessInstance               rva 0x5DC0D0
+  manager slot                 rva 0x33775F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DC170, OnGameStart 0x5DC3D0, call 0x264EA0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check B: checksum compare call spelling (E8 -> E9)
+  mods / file checksum         already patched        patch byte rva 0x1BEBDE
+  console use -> save flag     already patched        patch byte rva 0x9791FD
+  console use -> manager flag  already patched        patch byte rva 0x979209
+  save load -> manager flag    already patched        patch byte rva 0x24FDF7
+  ironman console (idle)       already patched        patch byte rva 0x335CEE
+  ironman console (restore)    already patched        patch byte rva 0x33739D
+  checksum warning (UI)        already patched        patch byte rva 0xF1751C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF17E3D
+  AccessInstance               rva 0x5DC0D0
+  manager slot                 rva 0x33775F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DC170, OnGameStart 0x5DC3D0, call 0x264EA0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check C: ironman idle, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1BEBDE
+  console use -> save flag     already patched        patch byte rva 0x9791FD
+  console use -> manager flag  already patched        patch byte rva 0x979209
+  save load -> manager flag    already patched        patch byte rva 0x24FDF7
+  ironman console (idle)       already patched        patch byte rva 0x335CEE
+  ironman console (restore)    already patched        patch byte rva 0x33739D
+  checksum warning (UI)        already patched        patch byte rva 0xF1751C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF17E3D
+  AccessInstance               rva 0x5DC0D0
+  manager slot                 rva 0x33775F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DC170, OnGameStart 0x5DC3D0, call 0x264EA0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check D: ironman restore, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1BEBDE
+  console use -> save flag     already patched        patch byte rva 0x9791FD
+  console use -> manager flag  already patched        patch byte rva 0x979209
+  save load -> manager flag    already patched        patch byte rva 0x24FDF7
+  ironman console (idle)       already patched        patch byte rva 0x335CEE
+  ironman console (restore)    already patched        patch byte rva 0x33739D
+  checksum warning (UI)        already patched        patch byte rva 0xF1751C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF17E3D
+  AccessInstance               rva 0x5DC0D0
+  manager slot                 rva 0x33775F8 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DC170, OnGameStart 0x5DC3D0, call 0x264EA0
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: save load -> manager flag: primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+OK
+
+file: D:\zStudy\stellaris\stellaris_versions\stellaris_4.4.5.exe
+image size 0x3950000
+
+pass 1: dry run (nothing written)
+  mods / file checksum         would patch            patch byte rva 0x1BFCEE
+  console use -> save flag     would patch            patch byte rva 0x9808FD
+  console use -> manager flag  would patch            patch byte rva 0x980909
+  save load -> manager flag    would patch            patch byte rva 0x25156C
+  ironman console (idle)       would patch            patch byte rva 0x3375FE
+  ironman console (restore)    would patch            patch byte rva 0x338CAD
+  checksum warning (UI)        would patch            patch byte rva 0xF2556C
+  checksum warning (tooltip)   would patch            patch byte rva 0xF25E8D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DE00 (call site + signature agree)
+  old-save repair hook         would hook             Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+pass 2: applied
+  mods / file checksum         patched                patch byte rva 0x1BFCEE
+  console use -> save flag     patched                patch byte rva 0x9808FD
+  console use -> manager flag  patched                patch byte rva 0x980909
+  save load -> manager flag    patched                patch byte rva 0x25156C
+  ironman console (idle)       patched                patch byte rva 0x3375FE
+  ironman console (restore)    patched                patch byte rva 0x338CAD
+  checksum warning (UI)        patched                patch byte rva 0xF2556C
+  checksum warning (tooltip)   patched                patch byte rva 0xF25E8D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DE00 (call site + signature agree)
+  old-save repair hook         hooked                 Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820, stub allocated next to the call site
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+pass 3: re-scan (idempotency)
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        already patched        patch byte rva 0xF2556C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF25E8D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DE00 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+pass 4: cosmetic patch off
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        skipped (cosmetic off)
+  checksum warning (tooltip)   skipped (cosmetic off)
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DE00 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check A: checksum compare register (8B F0 -> 8B F8)
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        already patched        patch byte rva 0xF2556C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF25E8D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DE00 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+drift check B: checksum compare call spelling (E8 -> E9)
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        already patched        patch byte rva 0xF2556C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF25E8D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DE00 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+drift check C: ironman idle, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        already patched        patch byte rva 0xF2556C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF25E8D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DE00 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+drift check D: ironman restore, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        already patched        patch byte rva 0xF2556C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF25E8D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DE00 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+OK
+
+file: D:\zStudy\stellaris\stellaris_versions\stellaris_4.4.6.exe
+image size 0x3950000
+
+pass 1: dry run (nothing written)
+  mods / file checksum         would patch            patch byte rva 0x1BFCEE
+  console use -> save flag     would patch            patch byte rva 0x9808FD
+  console use -> manager flag  would patch            patch byte rva 0x980909
+  save load -> manager flag    would patch            patch byte rva 0x25156C
+  ironman console (idle)       would patch            patch byte rva 0x3375FE
+  ironman console (restore)    would patch            patch byte rva 0x338CAD
+  checksum warning (UI)        would patch            patch byte rva 0xF2563C
+  checksum warning (tooltip)   would patch            patch byte rva 0xF25F5D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DDC0 (call site + signature agree)
+  old-save repair hook         would hook             Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+pass 2: applied
+  mods / file checksum         patched                patch byte rva 0x1BFCEE
+  console use -> save flag     patched                patch byte rva 0x9808FD
+  console use -> manager flag  patched                patch byte rva 0x980909
+  save load -> manager flag    patched                patch byte rva 0x25156C
+  ironman console (idle)       patched                patch byte rva 0x3375FE
+  ironman console (restore)    patched                patch byte rva 0x338CAD
+  checksum warning (UI)        patched                patch byte rva 0xF2563C
+  checksum warning (tooltip)   patched                patch byte rva 0xF25F5D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DDC0 (call site + signature agree)
+  old-save repair hook         hooked                 Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820, stub allocated next to the call site
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+pass 3: re-scan (idempotency)
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        already patched        patch byte rva 0xF2563C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF25F5D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DDC0 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+pass 4: cosmetic patch off
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        skipped (cosmetic off)
+  checksum warning (tooltip)   skipped (cosmetic off)
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DDC0 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+drift check A: checksum compare register (8B F0 -> 8B F8)
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        already patched        patch byte rva 0xF2563C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF25F5D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DDC0 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+drift check B: checksum compare call spelling (E8 -> E9)
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        already patched        patch byte rva 0xF2563C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF25F5D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DDC0 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+drift check C: ironman idle, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        already patched        patch byte rva 0xF2563C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF25F5D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DDC0 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+drift check D: ironman restore, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1BFCEE
+  console use -> save flag     already patched        patch byte rva 0x9808FD
+  console use -> manager flag  already patched        patch byte rva 0x980909
+  save load -> manager flag    already patched        patch byte rva 0x25156C
+  ironman console (idle)       already patched        patch byte rva 0x3375FE
+  ironman console (restore)    already patched        patch byte rva 0x338CAD
+  checksum warning (UI)        already patched        patch byte rva 0xF2563C
+  checksum warning (tooltip)   already patched        patch byte rva 0xF25F5D
+  AccessInstance               rva 0x5DFB80
+  manager slot                 rva 0x339DDC0 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5DFC20, OnGameStart 0x5DFE80, call 0x266820
+  note: mods / file checksum: primary signature gone, a fallback matched
+  note: ironman console (idle): primary signature gone, a fallback matched
+  note: ironman console (restore): primary signature gone, a fallback matched
+  note: checksum warning (tooltip): primary signature gone, a fallback matched
+
+OK
+
+file: D:\zStudy\stellaris\stellaris_versions\stellaris_4.5.1.exe
+image size 0x37F0000
+
+pass 1: dry run (nothing written)
+  mods / file checksum         would patch            patch byte rva 0x1B94A0
+  console use -> save flag     would patch            patch byte rva 0x92290D
+  console use -> manager flag  would patch            patch byte rva 0x922919
+  save load -> manager flag    would patch            patch byte rva 0x24A9CC
+  ironman console (idle)       would patch            patch byte rva 0x3329B7
+  ironman console (restore)    would patch            patch byte rva 0x333D8D
+  checksum warning (UI)        would patch            patch byte rva 0xEA0B07
+  checksum warning (tooltip)   would patch            patch byte rva 0xEA1366
+  AccessInstance               rva 0x5AE8A0
+  manager slot                 rva 0x3154E70 (call site + signature agree)
+  old-save repair hook         would hook             Update 0x5AE940, OnGameStart 0x5AECB0, call 0x25F013
+
+pass 2: applied
+  mods / file checksum         patched                patch byte rva 0x1B94A0
+  console use -> save flag     patched                patch byte rva 0x92290D
+  console use -> manager flag  patched                patch byte rva 0x922919
+  save load -> manager flag    patched                patch byte rva 0x24A9CC
+  ironman console (idle)       patched                patch byte rva 0x3329B7
+  ironman console (restore)    patched                patch byte rva 0x333D8D
+  checksum warning (UI)        patched                patch byte rva 0xEA0B07
+  checksum warning (tooltip)   patched                patch byte rva 0xEA1366
+  AccessInstance               rva 0x5AE8A0
+  manager slot                 rva 0x3154E70 (call site + signature agree)
+  old-save repair hook         hooked                 Update 0x5AE940, OnGameStart 0x5AECB0, call 0x25F013, stub allocated next to the call site
+
+pass 3: re-scan (idempotency)
+  mods / file checksum         already patched        patch byte rva 0x1B94A0
+  console use -> save flag     already patched        patch byte rva 0x92290D
+  console use -> manager flag  already patched        patch byte rva 0x922919
+  save load -> manager flag    already patched        patch byte rva 0x24A9CC
+  ironman console (idle)       already patched        patch byte rva 0x3329B7
+  ironman console (restore)    already patched        patch byte rva 0x333D8D
+  checksum warning (UI)        already patched        patch byte rva 0xEA0B07
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA1366
+  AccessInstance               rva 0x5AE8A0
+  manager slot                 rva 0x3154E70 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AE940, OnGameStart 0x5AECB0, call 0x25F013
+
+pass 4: cosmetic patch off
+  mods / file checksum         already patched        patch byte rva 0x1B94A0
+  console use -> save flag     already patched        patch byte rva 0x92290D
+  console use -> manager flag  already patched        patch byte rva 0x922919
+  save load -> manager flag    already patched        patch byte rva 0x24A9CC
+  ironman console (idle)       already patched        patch byte rva 0x3329B7
+  ironman console (restore)    already patched        patch byte rva 0x333D8D
+  checksum warning (UI)        skipped (cosmetic off)
+  checksum warning (tooltip)   skipped (cosmetic off)
+  AccessInstance               rva 0x5AE8A0
+  manager slot                 rva 0x3154E70 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AE940, OnGameStart 0x5AECB0, call 0x25F013
+
+drift check A: checksum compare register (8B F0 -> 8B F8)
+  mods / file checksum         already patched        patch byte rva 0x1B94A0
+  console use -> save flag     already patched        patch byte rva 0x92290D
+  console use -> manager flag  already patched        patch byte rva 0x922919
+  save load -> manager flag    already patched        patch byte rva 0x24A9CC
+  ironman console (idle)       already patched        patch byte rva 0x3329B7
+  ironman console (restore)    already patched        patch byte rva 0x333D8D
+  checksum warning (UI)        already patched        patch byte rva 0xEA0B07
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA1366
+  AccessInstance               rva 0x5AE8A0
+  manager slot                 rva 0x3154E70 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AE940, OnGameStart 0x5AECB0, call 0x25F013
+  note: mods / file checksum: primary signature gone, a fallback matched
+
+drift check B: checksum compare call spelling (E8 -> E9)
+  mods / file checksum         already patched        patch byte rva 0x1B94A0
+  console use -> save flag     already patched        patch byte rva 0x92290D
+  console use -> manager flag  already patched        patch byte rva 0x922919
+  save load -> manager flag    already patched        patch byte rva 0x24A9CC
+  ironman console (idle)       already patched        patch byte rva 0x3329B7
+  ironman console (restore)    already patched        patch byte rva 0x333D8D
+  checksum warning (UI)        already patched        patch byte rva 0xEA0B07
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA1366
+  AccessInstance               rva 0x5AE8A0
+  manager slot                 rva 0x3154E70 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AE940, OnGameStart 0x5AECB0, call 0x25F013
+  note: mods / file checksum: primary signature gone, a fallback matched
+
+drift check C: ironman idle, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1B94A0
+  console use -> save flag     already patched        patch byte rva 0x92290D
+  console use -> manager flag  already patched        patch byte rva 0x922919
+  save load -> manager flag    already patched        patch byte rva 0x24A9CC
+  ironman console (idle)       already patched        patch byte rva 0x3329B7
+  ironman console (restore)    already patched        patch byte rva 0x333D8D
+  checksum warning (UI)        already patched        patch byte rva 0xEA0B07
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA1366
+  AccessInstance               rva 0x5AE8A0
+  manager slot                 rva 0x3154E70 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AE940, OnGameStart 0x5AECB0, call 0x25F013
+  note: ironman console (idle): primary signature gone, a fallback matched
+
+drift check D: ironman restore, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1B94A0
+  console use -> save flag     already patched        patch byte rva 0x92290D
+  console use -> manager flag  already patched        patch byte rva 0x922919
+  save load -> manager flag    already patched        patch byte rva 0x24A9CC
+  ironman console (idle)       already patched        patch byte rva 0x3329B7
+  ironman console (restore)    already patched        patch byte rva 0x333D8D
+  checksum warning (UI)        already patched        patch byte rva 0xEA0B07
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA1366
+  AccessInstance               rva 0x5AE8A0
+  manager slot                 rva 0x3154E70 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AE940, OnGameStart 0x5AECB0, call 0x25F013
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+OK
+
+file: D:\zStudy\stellaris\stellaris_versions\stellaris_4.5.2.exe
+image size 0x37F2000
+
+pass 1: dry run (nothing written)
+  mods / file checksum         would patch            patch byte rva 0x1B97E0
+  console use -> save flag     would patch            patch byte rva 0x9219AD
+  console use -> manager flag  would patch            patch byte rva 0x9219B9
+  save load -> manager flag    would patch            patch byte rva 0x24AFFC
+  ironman console (idle)       would patch            patch byte rva 0x332FB7
+  ironman console (restore)    would patch            patch byte rva 0x33438D
+  checksum warning (UI)        would patch            patch byte rva 0xEA1267
+  checksum warning (tooltip)   would patch            patch byte rva 0xEA1AC6
+  AccessInstance               rva 0x5AEB00
+  manager slot                 rva 0x3155B38 (call site + signature agree)
+  old-save repair hook         would hook             Update 0x5AEBA0, OnGameStart 0x5AEF10, call 0x25F623
+
+pass 2: applied
+  mods / file checksum         patched                patch byte rva 0x1B97E0
+  console use -> save flag     patched                patch byte rva 0x9219AD
+  console use -> manager flag  patched                patch byte rva 0x9219B9
+  save load -> manager flag    patched                patch byte rva 0x24AFFC
+  ironman console (idle)       patched                patch byte rva 0x332FB7
+  ironman console (restore)    patched                patch byte rva 0x33438D
+  checksum warning (UI)        patched                patch byte rva 0xEA1267
+  checksum warning (tooltip)   patched                patch byte rva 0xEA1AC6
+  AccessInstance               rva 0x5AEB00
+  manager slot                 rva 0x3155B38 (call site + signature agree)
+  old-save repair hook         hooked                 Update 0x5AEBA0, OnGameStart 0x5AEF10, call 0x25F623, stub allocated next to the call site
+
+pass 3: re-scan (idempotency)
+  mods / file checksum         already patched        patch byte rva 0x1B97E0
+  console use -> save flag     already patched        patch byte rva 0x9219AD
+  console use -> manager flag  already patched        patch byte rva 0x9219B9
+  save load -> manager flag    already patched        patch byte rva 0x24AFFC
+  ironman console (idle)       already patched        patch byte rva 0x332FB7
+  ironman console (restore)    already patched        patch byte rva 0x33438D
+  checksum warning (UI)        already patched        patch byte rva 0xEA1267
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA1AC6
+  AccessInstance               rva 0x5AEB00
+  manager slot                 rva 0x3155B38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AEBA0, OnGameStart 0x5AEF10, call 0x25F623
+
+pass 4: cosmetic patch off
+  mods / file checksum         already patched        patch byte rva 0x1B97E0
+  console use -> save flag     already patched        patch byte rva 0x9219AD
+  console use -> manager flag  already patched        patch byte rva 0x9219B9
+  save load -> manager flag    already patched        patch byte rva 0x24AFFC
+  ironman console (idle)       already patched        patch byte rva 0x332FB7
+  ironman console (restore)    already patched        patch byte rva 0x33438D
+  checksum warning (UI)        skipped (cosmetic off)
+  checksum warning (tooltip)   skipped (cosmetic off)
+  AccessInstance               rva 0x5AEB00
+  manager slot                 rva 0x3155B38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AEBA0, OnGameStart 0x5AEF10, call 0x25F623
+
+drift check A: checksum compare register (8B F0 -> 8B F8)
+  mods / file checksum         already patched        patch byte rva 0x1B97E0
+  console use -> save flag     already patched        patch byte rva 0x9219AD
+  console use -> manager flag  already patched        patch byte rva 0x9219B9
+  save load -> manager flag    already patched        patch byte rva 0x24AFFC
+  ironman console (idle)       already patched        patch byte rva 0x332FB7
+  ironman console (restore)    already patched        patch byte rva 0x33438D
+  checksum warning (UI)        already patched        patch byte rva 0xEA1267
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA1AC6
+  AccessInstance               rva 0x5AEB00
+  manager slot                 rva 0x3155B38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AEBA0, OnGameStart 0x5AEF10, call 0x25F623
+  note: mods / file checksum: primary signature gone, a fallback matched
+
+drift check B: checksum compare call spelling (E8 -> E9)
+  mods / file checksum         already patched        patch byte rva 0x1B97E0
+  console use -> save flag     already patched        patch byte rva 0x9219AD
+  console use -> manager flag  already patched        patch byte rva 0x9219B9
+  save load -> manager flag    already patched        patch byte rva 0x24AFFC
+  ironman console (idle)       already patched        patch byte rva 0x332FB7
+  ironman console (restore)    already patched        patch byte rva 0x33438D
+  checksum warning (UI)        already patched        patch byte rva 0xEA1267
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA1AC6
+  AccessInstance               rva 0x5AEB00
+  manager slot                 rva 0x3155B38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AEBA0, OnGameStart 0x5AEF10, call 0x25F623
+  note: mods / file checksum: primary signature gone, a fallback matched
+
+drift check C: ironman idle, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1B97E0
+  console use -> save flag     already patched        patch byte rva 0x9219AD
+  console use -> manager flag  already patched        patch byte rva 0x9219B9
+  save load -> manager flag    already patched        patch byte rva 0x24AFFC
+  ironman console (idle)       already patched        patch byte rva 0x332FB7
+  ironman console (restore)    already patched        patch byte rva 0x33438D
+  checksum warning (UI)        already patched        patch byte rva 0xEA1267
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA1AC6
+  AccessInstance               rva 0x5AEB00
+  manager slot                 rva 0x3155B38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AEBA0, OnGameStart 0x5AEF10, call 0x25F623
+  note: ironman console (idle): primary signature gone, a fallback matched
+
+drift check D: ironman restore, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1B97E0
+  console use -> save flag     already patched        patch byte rva 0x9219AD
+  console use -> manager flag  already patched        patch byte rva 0x9219B9
+  save load -> manager flag    already patched        patch byte rva 0x24AFFC
+  ironman console (idle)       already patched        patch byte rva 0x332FB7
+  ironman console (restore)    already patched        patch byte rva 0x33438D
+  checksum warning (UI)        already patched        patch byte rva 0xEA1267
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA1AC6
+  AccessInstance               rva 0x5AEB00
+  manager slot                 rva 0x3155B38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AEBA0, OnGameStart 0x5AEF10, call 0x25F623
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+OK
+
+file: D:\zStudy\stellaris\stellaris_versions\stellaris_4.5.3.exe
+image size 0x37F8000
+
+pass 1: dry run (nothing written)
+  mods / file checksum         would patch            patch byte rva 0x1B96F0
+  console use -> save flag     would patch            patch byte rva 0x92363D
+  console use -> manager flag  would patch            patch byte rva 0x923649
+  save load -> manager flag    would patch            patch byte rva 0x24B0BC
+  ironman console (idle)       would patch            patch byte rva 0x3339A7
+  ironman console (restore)    would patch            patch byte rva 0x334D7D
+  checksum warning (UI)        would patch            patch byte rva 0xEA6C57
+  checksum warning (tooltip)   would patch            patch byte rva 0xEA74B6
+  AccessInstance               rva 0x5AFB40
+  manager slot                 rva 0x315AB38 (call site + signature agree)
+  old-save repair hook         would hook             Update 0x5AFBE0, OnGameStart 0x5AFF50, call 0x25FC23
+
+pass 2: applied
+  mods / file checksum         patched                patch byte rva 0x1B96F0
+  console use -> save flag     patched                patch byte rva 0x92363D
+  console use -> manager flag  patched                patch byte rva 0x923649
+  save load -> manager flag    patched                patch byte rva 0x24B0BC
+  ironman console (idle)       patched                patch byte rva 0x3339A7
+  ironman console (restore)    patched                patch byte rva 0x334D7D
+  checksum warning (UI)        patched                patch byte rva 0xEA6C57
+  checksum warning (tooltip)   patched                patch byte rva 0xEA74B6
+  AccessInstance               rva 0x5AFB40
+  manager slot                 rva 0x315AB38 (call site + signature agree)
+  old-save repair hook         hooked                 Update 0x5AFBE0, OnGameStart 0x5AFF50, call 0x25FC23, stub allocated next to the call site
+
+pass 3: re-scan (idempotency)
+  mods / file checksum         already patched        patch byte rva 0x1B96F0
+  console use -> save flag     already patched        patch byte rva 0x92363D
+  console use -> manager flag  already patched        patch byte rva 0x923649
+  save load -> manager flag    already patched        patch byte rva 0x24B0BC
+  ironman console (idle)       already patched        patch byte rva 0x3339A7
+  ironman console (restore)    already patched        patch byte rva 0x334D7D
+  checksum warning (UI)        already patched        patch byte rva 0xEA6C57
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA74B6
+  AccessInstance               rva 0x5AFB40
+  manager slot                 rva 0x315AB38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AFBE0, OnGameStart 0x5AFF50, call 0x25FC23
+
+pass 4: cosmetic patch off
+  mods / file checksum         already patched        patch byte rva 0x1B96F0
+  console use -> save flag     already patched        patch byte rva 0x92363D
+  console use -> manager flag  already patched        patch byte rva 0x923649
+  save load -> manager flag    already patched        patch byte rva 0x24B0BC
+  ironman console (idle)       already patched        patch byte rva 0x3339A7
+  ironman console (restore)    already patched        patch byte rva 0x334D7D
+  checksum warning (UI)        skipped (cosmetic off)
+  checksum warning (tooltip)   skipped (cosmetic off)
+  AccessInstance               rva 0x5AFB40
+  manager slot                 rva 0x315AB38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AFBE0, OnGameStart 0x5AFF50, call 0x25FC23
+
+drift check A: checksum compare register (8B F0 -> 8B F8)
+  mods / file checksum         already patched        patch byte rva 0x1B96F0
+  console use -> save flag     already patched        patch byte rva 0x92363D
+  console use -> manager flag  already patched        patch byte rva 0x923649
+  save load -> manager flag    already patched        patch byte rva 0x24B0BC
+  ironman console (idle)       already patched        patch byte rva 0x3339A7
+  ironman console (restore)    already patched        patch byte rva 0x334D7D
+  checksum warning (UI)        already patched        patch byte rva 0xEA6C57
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA74B6
+  AccessInstance               rva 0x5AFB40
+  manager slot                 rva 0x315AB38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AFBE0, OnGameStart 0x5AFF50, call 0x25FC23
+  note: mods / file checksum: primary signature gone, a fallback matched
+
+drift check B: checksum compare call spelling (E8 -> E9)
+  mods / file checksum         already patched        patch byte rva 0x1B96F0
+  console use -> save flag     already patched        patch byte rva 0x92363D
+  console use -> manager flag  already patched        patch byte rva 0x923649
+  save load -> manager flag    already patched        patch byte rva 0x24B0BC
+  ironman console (idle)       already patched        patch byte rva 0x3339A7
+  ironman console (restore)    already patched        patch byte rva 0x334D7D
+  checksum warning (UI)        already patched        patch byte rva 0xEA6C57
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA74B6
+  AccessInstance               rva 0x5AFB40
+  manager slot                 rva 0x315AB38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AFBE0, OnGameStart 0x5AFF50, call 0x25FC23
+  note: mods / file checksum: primary signature gone, a fallback matched
+
+drift check C: ironman idle, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1B96F0
+  console use -> save flag     already patched        patch byte rva 0x92363D
+  console use -> manager flag  already patched        patch byte rva 0x923649
+  save load -> manager flag    already patched        patch byte rva 0x24B0BC
+  ironman console (idle)       already patched        patch byte rva 0x3339A7
+  ironman console (restore)    already patched        patch byte rva 0x334D7D
+  checksum warning (UI)        already patched        patch byte rva 0xEA6C57
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA74B6
+  AccessInstance               rva 0x5AFB40
+  manager slot                 rva 0x315AB38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AFBE0, OnGameStart 0x5AFF50, call 0x25FC23
+  note: ironman console (idle): primary signature gone, a fallback matched
+
+drift check D: ironman restore, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1B96F0
+  console use -> save flag     already patched        patch byte rva 0x92363D
+  console use -> manager flag  already patched        patch byte rva 0x923649
+  save load -> manager flag    already patched        patch byte rva 0x24B0BC
+  ironman console (idle)       already patched        patch byte rva 0x3339A7
+  ironman console (restore)    already patched        patch byte rva 0x334D7D
+  checksum warning (UI)        already patched        patch byte rva 0xEA6C57
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA74B6
+  AccessInstance               rva 0x5AFB40
+  manager slot                 rva 0x315AB38 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5AFBE0, OnGameStart 0x5AFF50, call 0x25FC23
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+OK
+
+file: D:\zStudy\stellaris\stellaris_versions\stellaris_4.5.4.exe
+image size 0x37FA000
+
+pass 1: dry run (nothing written)
+  mods / file checksum         would patch            patch byte rva 0x1B9700
+  console use -> save flag     would patch            patch byte rva 0x924F8D
+  console use -> manager flag  would patch            patch byte rva 0x924F99
+  save load -> manager flag    would patch            patch byte rva 0x24B06C
+  ironman console (idle)       would patch            patch byte rva 0x336C07
+  ironman console (restore)    would patch            patch byte rva 0x337FDD
+  checksum warning (UI)        would patch            patch byte rva 0xEA8437
+  checksum warning (tooltip)   would patch            patch byte rva 0xEA8C96
+  AccessInstance               rva 0x5B2CC0
+  manager slot                 rva 0x315CB78 (call site + signature agree)
+  old-save repair hook         would hook             Update 0x5B2D60, OnGameStart 0x5B30D0, call 0x2600C3
+
+pass 2: applied
+  mods / file checksum         patched                patch byte rva 0x1B9700
+  console use -> save flag     patched                patch byte rva 0x924F8D
+  console use -> manager flag  patched                patch byte rva 0x924F99
+  save load -> manager flag    patched                patch byte rva 0x24B06C
+  ironman console (idle)       patched                patch byte rva 0x336C07
+  ironman console (restore)    patched                patch byte rva 0x337FDD
+  checksum warning (UI)        patched                patch byte rva 0xEA8437
+  checksum warning (tooltip)   patched                patch byte rva 0xEA8C96
+  AccessInstance               rva 0x5B2CC0
+  manager slot                 rva 0x315CB78 (call site + signature agree)
+  old-save repair hook         hooked                 Update 0x5B2D60, OnGameStart 0x5B30D0, call 0x2600C3, stub allocated next to the call site
+
+pass 3: re-scan (idempotency)
+  mods / file checksum         already patched        patch byte rva 0x1B9700
+  console use -> save flag     already patched        patch byte rva 0x924F8D
+  console use -> manager flag  already patched        patch byte rva 0x924F99
+  save load -> manager flag    already patched        patch byte rva 0x24B06C
+  ironman console (idle)       already patched        patch byte rva 0x336C07
+  ironman console (restore)    already patched        patch byte rva 0x337FDD
+  checksum warning (UI)        already patched        patch byte rva 0xEA8437
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA8C96
+  AccessInstance               rva 0x5B2CC0
+  manager slot                 rva 0x315CB78 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5B2D60, OnGameStart 0x5B30D0, call 0x2600C3
+
+pass 4: cosmetic patch off
+  mods / file checksum         already patched        patch byte rva 0x1B9700
+  console use -> save flag     already patched        patch byte rva 0x924F8D
+  console use -> manager flag  already patched        patch byte rva 0x924F99
+  save load -> manager flag    already patched        patch byte rva 0x24B06C
+  ironman console (idle)       already patched        patch byte rva 0x336C07
+  ironman console (restore)    already patched        patch byte rva 0x337FDD
+  checksum warning (UI)        skipped (cosmetic off)
+  checksum warning (tooltip)   skipped (cosmetic off)
+  AccessInstance               rva 0x5B2CC0
+  manager slot                 rva 0x315CB78 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5B2D60, OnGameStart 0x5B30D0, call 0x2600C3
+
+drift check A: checksum compare register (8B F0 -> 8B F8)
+  mods / file checksum         already patched        patch byte rva 0x1B9700
+  console use -> save flag     already patched        patch byte rva 0x924F8D
+  console use -> manager flag  already patched        patch byte rva 0x924F99
+  save load -> manager flag    already patched        patch byte rva 0x24B06C
+  ironman console (idle)       already patched        patch byte rva 0x336C07
+  ironman console (restore)    already patched        patch byte rva 0x337FDD
+  checksum warning (UI)        already patched        patch byte rva 0xEA8437
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA8C96
+  AccessInstance               rva 0x5B2CC0
+  manager slot                 rva 0x315CB78 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5B2D60, OnGameStart 0x5B30D0, call 0x2600C3
+  note: mods / file checksum: primary signature gone, a fallback matched
+
+drift check B: checksum compare call spelling (E8 -> E9)
+  mods / file checksum         already patched        patch byte rva 0x1B9700
+  console use -> save flag     already patched        patch byte rva 0x924F8D
+  console use -> manager flag  already patched        patch byte rva 0x924F99
+  save load -> manager flag    already patched        patch byte rva 0x24B06C
+  ironman console (idle)       already patched        patch byte rva 0x336C07
+  ironman console (restore)    already patched        patch byte rva 0x337FDD
+  checksum warning (UI)        already patched        patch byte rva 0xEA8437
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA8C96
+  AccessInstance               rva 0x5B2CC0
+  manager slot                 rva 0x315CB78 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5B2D60, OnGameStart 0x5B30D0, call 0x2600C3
+  note: mods / file checksum: primary signature gone, a fallback matched
+
+drift check C: ironman idle, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1B9700
+  console use -> save flag     already patched        patch byte rva 0x924F8D
+  console use -> manager flag  already patched        patch byte rva 0x924F99
+  save load -> manager flag    already patched        patch byte rva 0x24B06C
+  ironman console (idle)       already patched        patch byte rva 0x336C07
+  ironman console (restore)    already patched        patch byte rva 0x337FDD
+  checksum warning (UI)        already patched        patch byte rva 0xEA8437
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA8C96
+  AccessInstance               rva 0x5B2CC0
+  manager slot                 rva 0x315CB78 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5B2D60, OnGameStart 0x5B30D0, call 0x2600C3
+  note: ironman console (idle): primary signature gone, a fallback matched
+
+drift check D: ironman restore, multiplayer field offset
+  mods / file checksum         already patched        patch byte rva 0x1B9700
+  console use -> save flag     already patched        patch byte rva 0x924F8D
+  console use -> manager flag  already patched        patch byte rva 0x924F99
+  save load -> manager flag    already patched        patch byte rva 0x24B06C
+  ironman console (idle)       already patched        patch byte rva 0x336C07
+  ironman console (restore)    already patched        patch byte rva 0x337FDD
+  checksum warning (UI)        already patched        patch byte rva 0xEA8437
+  checksum warning (tooltip)   already patched        patch byte rva 0xEA8C96
+  AccessInstance               rva 0x5B2CC0
+  manager slot                 rva 0x315CB78 (call site + signature agree)
+  old-save repair hook         already hooked         Update 0x5B2D60, OnGameStart 0x5B30D0, call 0x2600C3
+  note: ironman console (restore): primary signature gone, a fallback matched
+
+OK
+

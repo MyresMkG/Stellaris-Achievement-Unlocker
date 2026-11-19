@@ -77,7 +77,7 @@ bool MapImage(const char* path, std::vector<uint8_t>* image, size_t* size) {
   return true;
 }
 
-void Report(const char* title, const unlocker::ApplyResult& r, uintptr_t base) {
+void Report(const char* title, const unlocker::ApplyResult& r, uintptr_t base, size_t size) {
   std::printf("%s\n", title);
   for (const unlocker::SiteResult& s : r.sites) {
     if (s.patch_address != 0) {
@@ -92,6 +92,15 @@ void Report(const char* title, const unlocker::ApplyResult& r, uintptr_t base) {
   std::printf("  %-28s rva 0x%zX (%s)\n", "manager slot",
               r.mgr_slot ? static_cast<size_t>(r.mgr_slot - base) : 0,
               r.slot_source.c_str());
+  const bool stub_in_image = r.hook.stub >= base && r.hook.stub - base < size;
+  std::printf("  %-28s %-22s Update 0x%zX, OnGameStart 0x%zX, call 0x%zX%s\n",
+              "old-save repair hook", r.hook.state.c_str(),
+              r.hook.update ? static_cast<size_t>(r.hook.update - base) : 0,
+              r.hook.on_game_start ? static_cast<size_t>(r.hook.on_game_start - base) : 0,
+              r.hook.call_site ? static_cast<size_t>(r.hook.call_site - base) : 0,
+              r.hook.stub == 0 ? ""
+                               : (stub_in_image ? ", stub in image"
+                                                : ", stub allocated next to the call site"));
   for (const std::string& note : r.notes) {
     std::printf("  note: %s\n", note.c_str());
   }
@@ -118,30 +127,56 @@ int main(int argc, char** argv) {
   bool ok = true;
 
   const unlocker::ApplyResult dry = unlocker::ApplyAll(image.data(), image.size(), false);
-  Report("pass 1: dry run (nothing written)", dry, base);
+  Report("pass 1: dry run (nothing written)", dry, base, size);
   for (const unlocker::SiteResult& s : dry.sites) {
     if (s.state != "would patch") ok = false;
   }
   if (dry.mgr_slot == 0) ok = false;
+  if (dry.hook.state != "would hook") ok = false;
 
   const unlocker::ApplyResult done = unlocker::ApplyAll(image.data(), image.size(), true);
-  Report("pass 2: applied", done, base);
+  Report("pass 2: applied", done, base, size);
   for (const unlocker::SiteResult& s : done.sites) {
     if (s.state != "patched") ok = false;
   }
+  if (done.hook.state != "hooked") ok = false;
+
+  // Check what the installer actually produced, not just its verdict: the stub
+  // must be "mov rax, <hook>; jmp rax" and the call at the site must land on it.
+  if (done.hook.stub != 0 && done.hook.call_site != 0) {
+    const uint8_t* const stub = reinterpret_cast<const uint8_t*>(done.hook.stub);
+    uint64_t target = 0;
+    std::memcpy(&target, stub + 2, sizeof(target));
+    int32_t rel = 0;
+    const uint8_t* const call = reinterpret_cast<const uint8_t*>(done.hook.call_site);
+    std::memcpy(&rel, call + 1, sizeof(rel));
+    const uintptr_t lands =
+        done.hook.call_site + 5 + static_cast<intptr_t>(rel);
+    const bool good = call[0] == 0xE8 && stub[0] == 0x48 && stub[1] == 0xB8 &&
+                      target == done.hook.hook_fn && stub[10] == 0xFF &&
+                      stub[11] == 0xE0 && lands == done.hook.stub;
+    if (!good) {
+      std::printf("  hook: the stub or the retarget is malformed\n");
+      ok = false;
+    }
+  } else {
+    std::printf("  hook: no stub was installed\n");
+    ok = false;
+  }
 
   const unlocker::ApplyResult again = unlocker::ApplyAll(image.data(), image.size(), false);
-  Report("pass 3: re-scan (idempotency)", again, base);
+  Report("pass 3: re-scan (idempotency)", again, base, size);
   for (const unlocker::SiteResult& s : again.sites) {
     if (s.state != "already patched") ok = false;
   }
   if (again.mgr_slot == 0) ok = false;
+  if (again.hook.state != "already hooked") ok = false;
 
   // The cosmetic opt-out must leave the other sites alone and only report the
   // display patch as skipped.
   const unlocker::ApplyResult off =
       unlocker::ApplyAll(image.data(), image.size(), false, false);
-  Report("pass 4: cosmetic patch off", off, base);
+  Report("pass 4: cosmetic patch off", off, base, size);
   for (const unlocker::SiteResult& s : off.sites) {
     const bool cosmetic =
         s.name == "checksum warning (UI)" || s.name == "checksum warning (tooltip)";
@@ -149,6 +184,7 @@ int main(int argc, char** argv) {
       ok = false;
     }
   }
+  if (off.hook.state != "already hooked") ok = false;
 
   // Cross-version checks. The community patch database for this game keeps
   // per-version patterns and records what actually moved between releases: the
@@ -181,7 +217,7 @@ int main(int argc, char** argv) {
     }
     const unlocker::ApplyResult drifted =
         unlocker::ApplyAll(image.data(), image.size(), false);
-    Report(title, drifted, base);
+    Report(title, drifted, base, size);
     bool seen = false;
     for (const unlocker::SiteResult& s : drifted.sites) {
       if (s.name != name) continue;
